@@ -21,9 +21,6 @@
     <ClCompile Include="Marker.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="Retinex.cpp">
-      <Filter>Archivos de código fuente</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Definitions.h">
@@ -33,9 +30,6 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="Profiling.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="retinex.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

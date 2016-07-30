@@ -74,6 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\OpenCV\install\include;C:\OpenCV\install\include\opencv;C:\OpenCV\install\include\opencv2</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\OpenCV\install\x86\vc14\lib</AdditionalLibraryDirectories>
@@ -94,6 +95,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\OpenCV\install\include;C:\OpenCV\install\include\opencv;C:\OpenCV\install\include\opencv2</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -118,13 +120,11 @@
   <ItemGroup>
     <ClCompile Include="ARGOSLandingPad.cpp" />
     <ClCompile Include="Marker.cpp" />
-    <ClCompile Include="Retinex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="Marker.h" />
     <ClInclude Include="Profiling.h" />
-    <ClInclude Include="retinex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

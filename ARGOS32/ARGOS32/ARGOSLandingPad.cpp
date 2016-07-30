@@ -27,7 +27,6 @@
 #include "Definitions.h"
 #include "Profiling.h"
 #include "Marker.h"
-//#include "Retinex.h"
 
 // -- Namespaces ----------------------------------------------------------------------------------
 

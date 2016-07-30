@@ -11,6 +11,7 @@
 #pragma once
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
+#include "Log.h"
 using namespace cv;
 using namespace std;
 

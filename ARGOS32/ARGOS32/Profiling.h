@@ -10,6 +10,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#ifndef __PROFILING_H__
+#define __PROFILING_H__
+
 // -- System-related timing libraries -------------------------------------------------------------
 
 #include <ctime>
@@ -25,27 +28,28 @@
 #define PROFILE_STOPTIME   1		// Index for variable holding stop time
 #define PROFILE_TIME       2		// Index for variable holding measured time
 
-// -- Profiling variables -------------------------------------------------------------------------
+// -- Profiling class -----------------------------------------------------------------------------
 
-float profiling_t[PROFILE_TIMERNUM][3];
+class CProfiling {
+private:
+	float profiling_t[PROFILE_TIMERNUM][3];			// Profiling time storage
+public:
+	inline void Start(int timer) {
+		profiling_t[timer][PROFILE_STARTTIME] = (float) clock()/CLOCKS_PER_SEC;
+	}
 
-// -- Profiling functions -------------------------------------------------------------------------
+	inline void Stop(int timer) {
+		profiling_t[timer][PROFILE_STOPTIME] = (float) clock()/CLOCKS_PER_SEC;
+		profiling_t[timer][PROFILE_TIME] = profiling_t[timer][PROFILE_STOPTIME]-profiling_t[timer][PROFILE_STARTTIME];
+	}
 
-inline void ProfilingStart(int timer) {
-	profiling_t[timer][PROFILE_STARTTIME] = (float) clock()/CLOCKS_PER_SEC;
-}
+	inline float GetTime(int timer) {
+		return profiling_t[timer][PROFILE_TIME];
+	}
 
-inline void ProfilingStop(int timer) {
-	profiling_t[timer][PROFILE_STOPTIME] = (float) clock()/CLOCKS_PER_SEC;
-	profiling_t[timer][PROFILE_TIME] = profiling_t[timer][PROFILE_STOPTIME]-profiling_t[timer][PROFILE_STARTTIME];
-}
+	inline float GetTimeMs(int timer) {
+		return profiling_t[timer][PROFILE_TIME]*1000.0f;
+	}
+};
 
-inline float ProfilingGetTime(int timer) {
-	return profiling_t[timer][PROFILE_TIME];
-}
-
-inline float ProfilingGetTimeMs(int timer) {
-	return profiling_t[timer][PROFILE_TIME]*1000.0;
-}
-
-
+#endif

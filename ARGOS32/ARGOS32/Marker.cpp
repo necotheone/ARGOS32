@@ -50,9 +50,11 @@ CCircle& CCircle::operator=(const CCircle& c) {
 void CCircle::CalcEllipse() {
 	float a, b;
 	Ellipse = fitEllipse(Contour);
-	a = Ellipse.size.height/2;		// Major semiaxes
-	b = Ellipse.size.width/2;		// Minor semiaxes
-	//cout << "ELLIPSE " << a << "," << b << endl;
+	a = Ellipse.size.height/2;		// Major semiaxis
+	b = Ellipse.size.width/2;		// Minor semiaxis
+	// == LOG DEBUG ===========================
+	FILE_LOG(logDEBUG3) << "ELLIPSE " << a << "," << b;
+	// ========================================
 	Eccentricity = sqrt(1-(b/a)*(b/a));
 	CircleRadius = a;
 }
@@ -141,7 +143,9 @@ bool CMarker::AddRing(CMarkerRing &r) {
 		// Check if ring was previously stored
 		if (ValidRings[id]) {
 			// TODO: Handle error messages properly
-			//cout << format("DEL RING - ID[%d] CR[%01.3f]",id,r.Cr) << endl;
+			// == LOG DEBUG ===========================
+			FILE_LOG(logDEBUG4) << format("DEL RING - ID[%d] CR[%01.3f]",id,r.Cr);
+			// ========================================
 		}
 		else {
 			RingNum++;
@@ -152,7 +156,9 @@ bool CMarker::AddRing(CMarkerRing &r) {
 			CalcConfMeasures();
 			res = true;
 			// TODO: Remove when done
-			//cout << format("ADD RING - ID[%d] RN[%d] CR[%01.3f]",id,RingNum,Rings[id].Cr) << endl;
+			// == LOG DEBUG ===========================
+			FILE_LOG(logDEBUG4) << format("ADD RING - ID[%d] RN[%d] CR[%01.3f]",id,RingNum,Rings[id].Cr);
+			// ========================================
 		}
 	}
 #endif
@@ -281,19 +287,21 @@ void CMarker::CalcRadius() {
 
 // Shows information on marker characteristics
 void CMarker::ShowMarkerInfo() {
-	cout << format("LPM INFO - N[%d] P(%1.3f,%1.3f) Conf { NR[%1.3f] Cr[%1.3f] Dr[%1.3f] MC[%1.3f] }",RingNum,Position.x,Position.y,ConfNumRings,ConfCr,ConfDr,ConfCenter) << endl;
-	//for (int i=0; i<MarkerType->RingNum[TypeId]; i++) {
-	//	cout << "      RING " << i << " ";
-	//	if (ValidRings[i]) {
-	//		cout << format("C(%1.3f,%1.3f) CD[%3.1f] Ar[%3.1f] Cr[%1.3f]",Rings[i].Center.x,Rings[i].Center.y,Rings[i].CenterDist,Rings[i].Area,Rings[i].Cr) << endl;
-	//		cout << "       INNER ";
-	//		cout << format("C(%1.3f,%1.3f) Rd[%3.1f] Pe[%3.1f] Ar[%3.1f] Rn[%1.3f] Ec[%1.3f]",Rings[i].InnerCircle.MassCenter.x,Rings[i].InnerCircle.MassCenter.y,Rings[i].InnerCircle.CircleRadius,Rings[i].InnerCircle.Perimeter,Rings[i].InnerCircle.Area,Rings[i].InnerCircle.Roundness,Rings[i].InnerCircle.Eccentricity) << endl;
-	//		cout << "       OUTER ";
-	//		cout << format("C(%1.3f,%1.3f) Rd[%3.1f] Pe[%3.1f] Ar[%3.1f] Rn[%1.3f] Ec[%1.3f]",Rings[i].OuterCircle.MassCenter.x,Rings[i].OuterCircle.MassCenter.y,Rings[i].OuterCircle.CircleRadius,Rings[i].OuterCircle.Perimeter,Rings[i].OuterCircle.Area,Rings[i].OuterCircle.Roundness,Rings[i].OuterCircle.Eccentricity) << endl;
-	//	}
-	//	else
-	//		cout << endl;
-	//}
+	FILE_LOG(logINFO) << format("LPM INFO - N[%d] P(%1.3f,%1.3f) Conf { NR[%1.3f] Cr[%1.3f] Dr[%1.3f] MC[%1.3f] }",RingNum,Position.x,Position.y,ConfNumRings,ConfCr,ConfDr,ConfCenter);
+	for (int i=0; i<MarkerType->RingNum[TypeId]; i++) {
+		string msg = format("      RING %d ",i);
+		string msg1, msg2;
+		if (ValidRings[i]) {
+			msg = msg + format("C(%1.3f,%1.3f) CD[%3.1f] Ar[%3.1f] Cr[%1.3f]",Rings[i].Center.x,Rings[i].Center.y,Rings[i].CenterDist,Rings[i].Area,Rings[i].Cr);
+			msg1 = format("       INNER C(%1.3f,%1.3f) Rd[%3.1f] Pe[%3.1f] Ar[%3.1f] Rn[%1.3f] Ec[%1.3f]",Rings[i].InnerCircle.MassCenter.x,Rings[i].InnerCircle.MassCenter.y,Rings[i].InnerCircle.CircleRadius,Rings[i].InnerCircle.Perimeter,Rings[i].InnerCircle.Area,Rings[i].InnerCircle.Roundness,Rings[i].InnerCircle.Eccentricity);
+			msg2 = format("       OUTER C(%1.3f,%1.3f) Rd[%3.1f] Pe[%3.1f] Ar[%3.1f] Rn[%1.3f] Ec[%1.3f]",Rings[i].OuterCircle.MassCenter.x,Rings[i].OuterCircle.MassCenter.y,Rings[i].OuterCircle.CircleRadius,Rings[i].OuterCircle.Perimeter,Rings[i].OuterCircle.Area,Rings[i].OuterCircle.Roundness,Rings[i].OuterCircle.Eccentricity);
+			FILE_LOG(logINFO1) << msg;
+			FILE_LOG(logINFO1) << msg1;
+			FILE_LOG(logINFO1) << msg2;
+		}
+		else
+			FILE_LOG(logINFO1) << msg;
+	}
 }
 
 // Check if point p is inside all the rings contained in marker
@@ -308,9 +316,11 @@ bool CMarker::CheckPointInside(Point2f p) {
 			d2 = (p.x-Rings[i].Center.x)*(p.x-Rings[i].Center.x) + (p.y-Rings[i].Center.y)*(p.y-Rings[i].Center.y);
 			r2 = Rings[i].InnerCircle.CircleRadius*Rings[i].InnerCircle.CircleRadius;
 			r = r2 - d2;
-			//cout << "R2 = " << r2 << endl;
-			//cout << "R  = " << Rings[i].InnerCircle.CircleRadius << endl;
-			//cout << "D2 = " << d2 << endl;
+			// == LOG DEBUG ===========================
+			FILE_LOG(logDEBUG4) << "R2 = " << r2;
+			FILE_LOG(logDEBUG4) << "R  = " << Rings[i].InnerCircle.CircleRadius;
+			FILE_LOG(logDEBUG4) << "D2 = " << d2;
+			// ========================================
 			if (r<=0) {
 				res = false;
 				break;
@@ -413,56 +423,60 @@ bool CMarkerType::Load() {
 
 bool CMarkerType::Load(string fname) {
 	int v;
-try {
-	FileStorage fs(fname,FileStorage::READ);
-	fs["Version"] >> v;
-	if (v!=ConfVersion) {
-		std::cout << "CONFIG ERROR: Configuration file version does not match current version" << endl;
-		std::cout << "              Loading default marker configuration" << endl;
-		DefaultType();
-		return false;
+	try {
+		FileStorage fs(fname,FileStorage::READ);
+		fs["Version"] >> v;
+		if (v!=ConfVersion) {
+			FILE_LOG(logWARNING) << "CONFIG ERROR: Configuration file version does not match current version";
+			FILE_LOG(logWARNING) << "              Loading default marker configuration";
+			DefaultType();
+			return false;
+		}
+		fs["NumTypes"] >> NumTypes;
+		RingNum.resize(NumTypes);
+		Cr.resize(NumTypes);
+		CrThr.resize(NumTypes);
+		Dr.resize(NumTypes);
+		DrThr.resize(NumTypes);
+		FileNode MarkerStructures = fs["MarkerStructures"];
+		FileNodeIterator itb = MarkerStructures.begin();
+		FileNodeIterator ite = MarkerStructures.end();
+		int i = 0;
+		for ( ; itb!=ite; ++itb, i++) {
+			RingNum[i] = (int)(*itb)["RingNum"];
+			Cr[i].resize(RingNum[i]);
+			CrThr[i].resize(RingNum[i]+1);
+			Dr[i].resize(RingNum[i]);
+			DrThr[i].resize(RingNum[i]+1);
+			(*itb)["Cr"] >> Cr[i];
+			(*itb)["CrThr"] >> CrThr[i];
+			(*itb)["Dr"] >> Dr[i];
+			(*itb)["DrThr"] >> DrThr[i];
+		}
+		fs.release();
+		// == LOG DEBUG ===========================
+		// TODO: Remove when checking load finishes
+		FILE_LOG(logDEBUG4) << "Configuration loaded, version " << format("%02d",v);
+		FILE_LOG(logDEBUG4) << "Number of types: " << NumTypes;
+		for (int i=0; i<NumTypes; i++) {
+			FILE_LOG(logDEBUG4) << "Structure " << i << ": " << RingNum[i] << " rings";
+			string msg = "Cr:    ";
+			for (int j=0; j<RingNum[i]; j++)
+				msg += format("%1.3f ",Cr[i][j]);
+			FILE_LOG(logDEBUG4) << msg;
+			msg = "CrThr: ";
+			for (int j=0; j<RingNum[i]+1; j++)
+				msg += format("%1.3f ",CrThr[i][j]);
+			FILE_LOG(logDEBUG4) << msg;
+		}
+		// ========================================
 	}
-	fs["NumTypes"] >> NumTypes;
-	RingNum.resize(NumTypes);
-	Cr.resize(NumTypes);
-	CrThr.resize(NumTypes);
-	Dr.resize(NumTypes);
-	DrThr.resize(NumTypes);
-	FileNode MarkerStructures = fs["MarkerStructures"];
-	FileNodeIterator itb = MarkerStructures.begin();
-	FileNodeIterator ite = MarkerStructures.end();
-	int i = 0;
-	for ( ; itb!=ite; ++itb, i++) {
-		RingNum[i] = (int)(*itb)["RingNum"];
-		Cr[i].resize(RingNum[i]);
-		CrThr[i].resize(RingNum[i]+1);
-		Dr[i].resize(RingNum[i]);
-		DrThr[i].resize(RingNum[i]+1);
-		(*itb)["Cr"] >> Cr[i];
-		(*itb)["CrThr"] >> CrThr[i];
-		(*itb)["Dr"] >> Dr[i];
-		(*itb)["DrThr"] >> DrThr[i];
+	catch( cv::Exception& e ) {
+		const char* err_msg = e.what();
+		// == LOG DEBUG ===========================
+		FILE_LOG(logERROR) << "Exception caught: " << err_msg;
+		// ========================================
 	}
-	fs.release();
-	// TODO: Remove when checking load finishes
-	//cout << "Configuration loaded, version " << format("%02d",v) << endl;
-	//cout << "Number of types: " << NumTypes << endl;
-	//for (int i=0; i<NumTypes; i++) {
-	//	cout << "Structure " << i << ": " << RingNum[i] << " rings" << endl;
-	//	cout << "Cr:    ";
-	//	for (int j=0; j<RingNum[i]; j++)
-	//		cout << format("%1.3f",Cr[i][j]) << " ";
-	//	cout << endl;
-	//	cout << "CrThr: ";
-	//	for (int j=0; j<RingNum[i]+1; j++)
-	//		cout << format("%1.3f",CrThr[i][j]) << " ";
-	//	cout << endl;
-	//}
-}
-catch( cv::Exception& e ) {
-    const char* err_msg = e.what();
-    std::cout << "exception caught: " << err_msg << std::endl;
-}
 	return true;
 }
 
@@ -526,7 +540,9 @@ bool CLandingPad::AddRing(CMarkerRing &r) {
 	for (i=0; i<NumMarkers; i++) {
 		if (Markers[i].CheckPointInsideTmp(r.Center)) {
 			isInsideIdx = i;
-			//cout << format("RING C(%3.1f,%3.1f) INSIDE MARKER %d",r.Center.x,r.Center.y,i) << endl;
+			// == LOG DEBUG ===========================
+			FILE_LOG(logDEBUG3) << format("RING C(%3.1f,%3.1f) INSIDE MARKER %d",r.Center.x,r.Center.y,i);
+			// ========================================
 			break;
 		}
 	}
@@ -549,29 +565,33 @@ bool CLandingPad::AddRing(CMarkerRing &r) {
 void CLandingPad::OrganizeRings() {
 	int i,j;
 	for (i=0; i<NumMarkers; i++) {
+		// == LOG DEBUG ===========================
 		#ifdef RINGDETECTION_DEBUG
-		cout << "ORGANIZING MARKER " << i << endl;
-		cout << "  " << Markers[i].TmpRingsNum << " DETECTED" << endl;
+		FILE_LOG(logDEBUG) << "ORGANIZING MARKER " << i;
+		FILE_LOG(logDEBUG) << "  " << Markers[i].TmpRingsNum << " DETECTED";
 		vector<CMarkerRing>::iterator its = Markers[i].TmpRings.begin();
 		j=0;
 		while (its!=Markers[i].TmpRings.end()) {
-			cout << format("  RING %d - R[%3.1f]",j,(*its).OuterCircle.CircleRadius) << endl;
+			FILE_LOG(logDEBUG) << format("  RING %d - R[%3.1f]",j,(*its).OuterCircle.CircleRadius);
 			j++;
 			its++;
 		}
 		#endif
+		// ========================================
 		// Sort temporal ring list in ascending order
 		sort(Markers[i].TmpRings.begin(),Markers[i].TmpRings.end());
+		// == LOG DEBUG ===========================
 		#ifdef RINGDETECTION_DEBUG
-		cout << "  " << Markers[i].TmpRingsNum << " SORTED" << endl;
+		FILE_LOG(logDEBUG) << "  " << Markers[i].TmpRingsNum << " SORTED";
 		its = Markers[i].TmpRings.begin();
 		j=0;
 		while (its!=Markers[i].TmpRings.end()) {
-			cout << format("  RING %d - R[%3.1f]",j,(*its).OuterCircle.CircleRadius) << endl;
+			FILE_LOG(logDEBUG) << format("  RING %d - R[%3.1f]",j,(*its).OuterCircle.CircleRadius);
 			j++;
 			its++;
 		}
 		#endif
+		// ========================================
 		// Check for equal rings (rings overlapping)
 		// TODO: Verify that this situation can really happen; if not, remove this check
 		vector<CMarkerRing>::iterator it = Markers[i].TmpRings.begin();
@@ -580,9 +600,11 @@ void CLandingPad::OrganizeRings() {
 		while (j<Markers[i].TmpRingsNum-1) {
 			itn = it+1;
 			if (*it==*itn) {
+				// == LOG DEBUG ===========================
 				#ifdef RINGDETECTION_DEBUG
-				cout << "  OVERLAPPING RINGS DETECTED" << endl;
+				FILE_LOG(logDEBUG) << "  OVERLAPPING RINGS DETECTED";
 				#endif
+				// ========================================
 				// Remove ring with lower Cr confidence
 				float Cr1 = Markers[i].CalcRingCrCM(j,(*it).Cr);
 				float Cr2 = Markers[i].CalcRingCrCM(j,(*itn).Cr);
@@ -603,13 +625,17 @@ void CLandingPad::OrganizeRings() {
 		}
 		// Check number of rings and compare it with expected maker rings
 		const int markerExpRings = Markers[i].GetTRingNum();
+		// == LOG DEBUG ===========================
 		#ifdef RINGDETECTION_DEBUG
-		cout << "  EXPECTED RINGS: " << markerExpRings << endl;
+		FILE_LOG(logDEBUG) << "  EXPECTED RINGS: " << markerExpRings;
 		#endif
+		// ========================================
 		if (Markers[i].TmpRingsNum == markerExpRings) {
+			// == LOG DEBUG ===========================
 			#ifdef RINGDETECTION_DEBUG
-			cout << "  ALL RINGS DETECTED: Copying to marker structure" << endl;
+			FILE_LOG(logDEBUG) << "  ALL RINGS DETECTED: Copying to marker structure";
 			#endif
+			// ========================================
 			// Number of rings as expected: copy rings to marker structure preserving order
 			Markers[i].RingNum = Markers[i].TmpRingsNum;
 			vector<CMarkerRing>::iterator it = Markers[i].TmpRings.begin();
@@ -626,9 +652,11 @@ void CLandingPad::OrganizeRings() {
 		if (Markers[i].TmpRingsNum < markerExpRings) {
 			// One or more rings not detected: assign rings using Dr
 			int numDiff = markerExpRings - Markers[i].TmpRingsNum;
+			// == LOG DEBUG ===========================
 			#ifdef RINGDETECTION_DEBUG
-			cout << format("  %d RINGS NOT DETECTED",numDiff) << endl;
+			FILE_LOG(logDEBUG) << format("  %d RINGS NOT DETECTED",numDiff);
 			#endif
+			// ========================================
 			float ConfDr;
 			float MaxCDr = -1000.0;
 			int   MaxCDrIdx = 0;
@@ -643,9 +671,11 @@ void CLandingPad::OrganizeRings() {
 			// Rows in the Dr matrix are normalized using the ring location indicated by the row index
 			// Thus, the first row assumes the maximum diameter ring is the first one (the innermost marker ring)
 			// Conversely, the last row gives the normalized Dr values using the outmost marker ring
+			// == LOG DEBUG ===========================
 			#ifdef RINGDETECTION_DEBUG
-			cout << "  CALCULATING NORMALIZED Dr - " << numDiff+1 << " COMBINATIONS" << endl;
+			FILE_LOG(logDEBUG) << "  CALCULATING NORMALIZED Dr - " << numDiff+1 << " COMBINATIONS";
 			#endif
+			// ========================================
 			for (j=0; j<=numDiff; j++) {
 				TmpDr[j].resize(Markers[i].TmpRingsNum);
 				TmpIdx[j].resize(Markers[i].TmpRingsNum);
@@ -654,32 +684,39 @@ void CLandingPad::OrganizeRings() {
 				int NormIdx = Markers[i].GetTRingNum()-1-j;
 				int TmpNormIdx = Markers[i].TmpRingsNum-1;
 				float NormDr = Markers[i].GetTmpRingRadius(TmpNormIdx);
+				// == LOG DEBUG ===========================
 				#ifdef RINGDETECTION_DEBUG
-				cout << format("  COMBINATION %d - NormRing Idx [%d] R [%3.1f]",j,NormIdx,NormDr) << endl;
+				FILE_LOG(logDEBUG) << format("  COMBINATION %d - NormRing Idx [%d] R [%3.1f]",j,NormIdx,NormDr);
 				#endif
+				// ========================================
 				for (int n=0; n<Markers[i].TmpRingsNum; n++)
 					TmpDr[j][n] = Markers[i].GetTmpRingRadius(n)/NormDr;
+				// == LOG DEBUG ===========================
 				#ifdef RINGDETECTION_DEBUG
-				cout << "  TmpDr  [";
+				string msg = "  TmpDr  [";
 				for (int n=0; n<Markers[i].TmpRingsNum; n++)
-					cout << format(" %3.1f ",TmpDr[j][n]);
-				cout << "]" << endl;
-				cout << "  IDENTIFYING RINGS WITH Dr MATRIX (type " << mtIdx << ")" << endl;
+					msg += format(" %3.1f ",TmpDr[j][n]);
+				msg += "]";
+				FILE_LOG(logDEBUG) << msg;
+				FILE_LOG(logDEBUG) << "  IDENTIFYING RINGS WITH Dr MATRIX (type " << mtIdx << ")";
 				#endif
+				// ========================================
 				// Identify rings using the Dr matrix
 				for (int m=0; m<Markers[i].TmpRingsNum; m++) {
+					// == LOG DEBUG ===========================
 					#ifdef RINGDETECTION_DEBUG
-					cout << "  TmpRing " << m << " - TmpDr: " << TmpDr[j][m] << endl;
-					cout << "  Cr Matrix:" << endl;
+					FILE_LOG(logDEBUG) << "  TmpRing " << m << " - TmpDr: " << TmpDr[j][m];
+					FILE_LOG(logDEBUG) << "  Cr Matrix:";
 					for (int n=0; n<Markers[i].GetTRingNum(); n++) {
 						string ms1 = "[ ";
 						for (int r=0; r<Markers[i].GetTRingNum(); r++) {
 							ms1 += format("%3.2f ",Markers[i].GetTDrMVal(n,r));
 						}
 						ms1 += "]";
-						cout << "  " << ms1 << endl;
+						FILE_LOG(logDEBUG) << "  " << ms1;
 					}
 					#endif
+					// ========================================
 					// Build thresholds from active Dr matrix row
 					tvFloat DrmThr;
 					DrmThr.resize(Markers[i].GetTRingNum()+1);
@@ -692,30 +729,39 @@ void CLandingPad::OrganizeRings() {
 						// TODO: Thresholds need to be calculated and used for identification
 						float t1 = DrmThr[n];
 						float t2 = DrmThr[n+1];
+						// == LOG DEBUG ===========================
 						#ifdef RINGDETECTION_DEBUG
-						cout << format("  Checking Drm(%d,%d)=%1.3f - ",NormIdx,n,Markers[i].GetTDrMVal(NormIdx,n));
-						cout << format("Thr(%1.3f,%1.3f) - ",t1,t2);
+						string msg = "";
+						msg += format("  Checking Drm(%d,%d)=%1.3f - ",NormIdx,n,Markers[i].GetTDrMVal(NormIdx,n));
+						msg += format("Thr(%1.3f,%1.3f) - ",t1,t2);
 						#endif
+						// ========================================
 						if (TmpDr[j][m]>=t1 && TmpDr[j][m]<t2) {
 							#ifdef RINGDETECTION_DEBUG
-							cout << "IDENTIFIED: TmpRing(" << m << ") -> Ring(" << n << ")" << endl;
+							msg += "IDENTIFIED: TmpRing(" << m << ") -> Ring(" << n << ")";
+							FILE_LOG(logDEBUG) << msg;
 							#endif
 							TmpIdx[j][m] = n;
 							break;
 						}
+						// == LOG DEBUG ===========================
 						#ifdef RINGDETECTION_DEBUG
 						else {
-							cout << "NO" << endl;
+							FILE_LOG(logDEBUG) << "NO";
 						}
 						#endif
+						// ========================================
 					}
 				}
+				// == LOG DEBUG ===========================
 				#ifdef RINGDETECTION_DEBUG
-				cout << "  TmpIdx [";
+				string msg = "  TmpIdx [";
 				for (int n=0; n<Markers[i].TmpRingsNum; n++)
-					cout << format(" %d ",TmpIdx[j][n]);
-				cout << "]" << endl;
+					msg += format(" %d ",TmpIdx[j][n]);
+				msg += "]";
+				FILE_LOG(logDEBUG) << msg;
 				#endif
+				// ========================================
 				// Calculate Dr confidence and update maximum index
 				ConfDr = 0.0;
 				for (int m=0; m<Markers[i].TmpRingsNum; m++)
@@ -725,9 +771,11 @@ void CLandingPad::OrganizeRings() {
 					MaxCDr = ConfDr;
 					MaxCDrIdx = j;
 				}
+				// == LOG DEBUG ===========================
 				#ifdef RINGDETECTION_DEBUG
-				cout << format("  ConfDr [ Conf %1.3f Max %1.3f MaxIdx %d ]",ConfDr,MaxCDr,MaxCDrIdx) << endl;
+				FILE_LOG(logDEBUG) << format("  ConfDr [ Conf %1.3f Max %1.3f MaxIdx %d ]",ConfDr,MaxCDr,MaxCDrIdx);
 				#endif
+				// ========================================
 			}
 			// Copy the most likely configuration depending on Dr confidence
 			Markers[i].RingNum = Markers[i].TmpRingsNum;
@@ -741,7 +789,11 @@ void CLandingPad::OrganizeRings() {
 		}
 		if (Markers[i].TmpRingsNum > markerExpRings) {
 			// TODO: Implement this case
-			cout << "TOO MUCH RINGS ASSOCIATED WITH MARKER: DISCARDED" << endl;
+			// == LOG DEBUG ===========================
+			#ifdef RINGDETECTION_DEBUG
+			FILE_LOG(logDEBUG) << "TOO MUCH RINGS ASSOCIATED WITH MARKER: DISCARDED";
+			#endif
+			// ========================================
 		}
 	}
 }
@@ -749,9 +801,9 @@ void CLandingPad::OrganizeRings() {
 // Show information on landing pad detected characteristics
 void CLandingPad::ShowLandingPadInfo() {
 	int i;
-	cout << format("LP INFO: %d Markers ===============================",NumMarkers) << endl;
+	FILE_LOG(logINFO) << format("LP INFO: %d Markers ===============================",NumMarkers);
 	for (i=0; i<NumMarkers; i++) {
-		//cout << format("MARKER   %d ---------------------------------------",i) << endl;
+		FILE_LOG(logINFO1) << format("MARKER   %d ---------------------------------------",i);
 		Markers[i].ShowMarkerInfo();
 	}
 }

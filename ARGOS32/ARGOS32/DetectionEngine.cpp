@@ -48,6 +48,7 @@
 // -- Class declarations --------------------------------------------------------------------------
 
 #include "DetectionEngine.h"
+using namespace cv;
 
 // == CDetectionEngine: detection methods framework ===============================================
 
@@ -67,7 +68,7 @@ CDetectionEngine::CDetectionEngine(void) {
 
 CDetectionEngine::~CDetectionEngine(void) {
 	// Free allocated detection methods
-	for (int i=0; i<DetectionMethods.size(); i++)
+	for (int i=0; i<(int) DetectionMethods.size(); i++)
 		delete DetectionMethods[i];
 }
 

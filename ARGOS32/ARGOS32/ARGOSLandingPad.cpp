@@ -144,8 +144,8 @@ void SetActiveParameter(int i) {
 		ProcModParStep = 1.0;
 	}
 	else {
-		ProcModParBigStep = (ProcModParMax-ProcModParMin)/100.0;
-		ProcModParStep = ProcModParBigStep/10.0;
+		ProcModParBigStep = (ProcModParMax-ProcModParMin)/100.0f;
+		ProcModParStep = ProcModParBigStep/10.0f;
 	}
 	ProcModParDefault = ProcModParValue;
 	// 	cout << "Activated DM Parameter " << i << endl;

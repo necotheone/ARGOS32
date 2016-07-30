@@ -20,7 +20,6 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
-//  using namespace cv;
 //  using namespace std;
 
 // -- ARGOS Vision libraries ----------------------------------------------------------------------
@@ -58,11 +57,11 @@ public:
 	string GetActiveDMName();							// Get the active detection method name
 	int    GetActiveDMParNumber();						// Get the number of configuration parameters of active detection method
 	// Detection interface
-	Mat    Process(Mat &frame);							// Frame processing function
-	void   CheckKeyboard();								// Keyboard input handling
-	void   ShowInfo();									// Results and information generation on output frame
-	void   LogInfo();									// Results and information logging (console and/or file)
-	Mat    GetResultsFrame();							// Get the results frame of the active detection method
-	Mat    GetProcessFrame();							// Get the process frame of the active detection method
+	cv::Mat    Process(cv::Mat &frame);					// Frame processing function
+	void       CheckKeyboard();							// Keyboard input handling
+	void       ShowInfo();								// Results and information generation on output frame
+	void       LogInfo();								// Results and information logging (console and/or file)
+    cv::Mat    GetResultsFrame();						// Get the results frame of the active detection method
+    cv::Mat    GetProcessFrame();						// Get the process frame of the active detection method
 };
 

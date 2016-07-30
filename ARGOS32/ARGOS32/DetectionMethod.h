@@ -20,7 +20,6 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
-using namespace cv;
 using namespace std;
 
 // -- ARGOS Vision libraries ----------------------------------------------------------------------
@@ -54,8 +53,8 @@ public:
 	// Profiling
 	CProfiling  Profiling;
 	// Frames to show
-	Mat         ResultsFrame;					// Frame image to be shown with results of detection method
-	Mat         ProcessFrame;					// Frame image to be shown with intermediate processing
+    cv::Mat     ResultsFrame;					// Frame image to be shown with results of detection method
+    cv::Mat     ProcessFrame;					// Frame image to be shown with intermediate processing
 	// Log configuration
 protected:
 	string      LogFileName;					// Active log file name
@@ -76,22 +75,22 @@ protected:
 	void CloseLogFile();						// Close log file if opened
 	// Detection method interface
 public:
-	virtual Mat    Process(Mat &frame);			// Frame processing function
-	virtual void   CheckKeyboard();				// Keyboard input handling
-	virtual void   ShowInfo();					// Results and information presentation on frame
-	virtual void   LogInfo();					// Results and information logging on console and file
-	virtual int    GetParNumber();				// Get the number of configuration parameters
-	virtual float  GetParValue(int p);			// Get the value of parameter p (index)
-	virtual string GetParName(int p);			// Get the name of parameter p (index)
-	virtual bool   GetParType(int p);			// Get the type of parameter p (index)
-	virtual float  GetParMax(int p);			// Get the maximum allowed value of parameter p (index)
-	virtual float  GetParMin(int p);			// Get the minimum allowed value of parameter p (index)
-	virtual void   SetParValue(int p, float v);	// Set the value for specified parameter 
+	virtual cv::Mat Process(cv::Mat &frame);      // Frame processing function
+	virtual void    CheckKeyboard();              // Keyboard input handling
+	virtual void    ShowInfo();                   // Results and information presentation on frame
+	virtual void    LogInfo();                    // Results and information logging on console and file
+	virtual int     GetParNumber();               // Get the number of configuration parameters
+	virtual float   GetParValue(int p);           // Get the value of parameter p (index)
+	virtual string  GetParName(int p);            // Get the name of parameter p (index)
+	virtual bool    GetParType(int p);            // Get the type of parameter p (index)
+	virtual float   GetParMax(int p);             // Get the maximum allowed value of parameter p (index)
+	virtual float   GetParMin(int p);             // Get the minimum allowed value of parameter p (index)
+	virtual void    SetParValue(int p, float v);  // Set the value for specified parameter 
 protected:
 	virtual void ResetStatistics();				// Reset statistics variables, called only from derived classes
 public:
 	// Common helper functions
-	void drawPointMarker(Mat &f,Point c,int s,Scalar &color,int thickness=1,bool rot=false);
-	void drawInfoText(Mat &f,int line,string text,cv::Scalar color,bool shadow=false);
-	void drawInfoText(Mat &f,int line,vector<string> &text,cv::Scalar color,bool shadow=false);
+	void drawPointMarker(cv::Mat &f, cv::Point c,int s, cv::Scalar &color,int thickness=1,bool rot=false);
+	void drawInfoText(cv::Mat &f,int line,string text,cv::Scalar color,bool shadow=false);
+	void drawInfoText(cv::Mat &f,int line,vector<string> &text,cv::Scalar color,bool shadow=false);
 };

@@ -20,6 +20,7 @@
 // -- Class declarations --------------------------------------------------------------------------
 
 #include "DMMSQI.h"
+using namespace cv;
 
 // -- Construction and destruction ----------------------------------------------------------------
 
@@ -37,13 +38,13 @@ CDMMSQI::~CDMMSQI(void) {
 // -- Detection interface -------------------------------------------------------------------------
 
 Mat CDMMSQI::Process(Mat &frame) {
-	unsigned int i,j;
+	unsigned int i;
 
 	Profiling.Start(PROFILE_TIMER1);
 	// Convert captured frame to gray scale
 	cvtColor(frame,gframe,CV_RGB2GRAY);
 	// Get binary image from MSQI processing
-	bframe = MSQIPreprocessing(gframe,Config.MSQIThreshold,Config.MSQISigma);
+	bframe = MSQIPreprocessing(gframe,(int) Config.MSQIThreshold,(int) Config.MSQISigma);
 	// Find contours organized in a two-level hierarchy
 	findContours(bframe, contours, hierarchy, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE);
 	// Reset processing variables based on found contours
@@ -53,14 +54,14 @@ Mat CDMMSQI::Process(Mat &frame) {
 	// Initialize detection flags
 	InitDetectionFlags();
 	// Get the moments, perimeters and roundness of contours and filter out undesired ones
-	for (i=0; i<nContours; i++) {
+	for (i=0; i<(unsigned int) nContours; i++) {
 		// Get contour moments
 		mu[i] = moments(contours[i],false);
 		// Filter out small contours
 		if (mu[i].m00>=Config.ContourMinArea) {
 			// Get perimeter and calculate roundness
-			perimeter[i] = arcLength(contours[i],true);
-			roundness[i] = 4*M_PI*mu[i].m00/(perimeter[i]*perimeter[i]);
+			perimeter[i] = (float) arcLength(contours[i],true);
+			roundness[i] = (float) (4*M_PI*mu[i].m00/(perimeter[i]*perimeter[i]));
 			// Filter out low roundness (not circular) contours
 			if (roundness[i]>=Config.ContourMinRoundness) {
 				// Filter out top level contours without children (holes)
@@ -89,7 +90,7 @@ Mat CDMMSQI::Process(Mat &frame) {
 	//  Get mass centers
 	mc.resize(contours.size());
 	for (i=0; i<contours.size(); i++)
-		mc[i] = Point2f(mu[i].m10/mu[i].m00,mu[i].m01/mu[i].m00);
+		mc[i] = Point2f((float) (mu[i].m10/mu[i].m00), (float) (mu[i].m01/mu[i].m00));
 	// Traverse hierarchy to retrieve top-level contours with holes
 	LandingPad.Reset();
 	for (i=0; i<contours.size(); i++) {
@@ -107,8 +108,8 @@ Mat CDMMSQI::Process(Mat &frame) {
 						nRings++;
 						// Store detected ring
 						// TODO: Study how to boost performance
-						CCircle innercircle(contours[ih],mc[ih],mu[ih].m00,perimeter[ih],roundness[ih]);
-						CCircle outercircle(contours[i],mc[i],mu[i].m00,perimeter[i],roundness[i]);
+						CCircle innercircle(contours[ih],mc[ih], (float) mu[ih].m00,perimeter[ih],roundness[ih]);
+						CCircle outercircle(contours[i],mc[i], (float) mu[i].m00,perimeter[i],roundness[i]);
 						CMarkerRing MarkerRing(outercircle,innercircle);
 						// TODO: Check if ring center is inside the marker area
 						// Add the ring to the marker
@@ -164,7 +165,7 @@ void CDMMSQI::ShowInfo() {
 	rframe=ResultsFrame;
 	// Draw detected markers
 	for (j=0; j<LandingPad.NumMarkers; j++) {
-		for (i=0; i<LandingPad.Markers[j].Rings.size(); i++) {
+		for (i=0; i<(int) LandingPad.Markers[j].Rings.size(); i++) {
 			if (LandingPad.Markers[j].ValidRings[i]) {
 				// Draw filled ring
 				vector<Point> oc = LandingPad.Markers[j].Rings[i].OuterCircle.Contour;
@@ -180,7 +181,7 @@ void CDMMSQI::ShowInfo() {
 		drawPointMarker(rframe,LandingPad.Markers[j].Position,3,cMarkerCenter);
 	}
 	// Draw contours
-	for (i=0; i<contours.size(); i++) {
+	for (i=0; i<(int) contours.size(); i++) {
 		if (valid[i])     drawContours(rframe,contours,i,cValid,1,8);
 		if (smallSize[i]) drawContours(rframe,contours,i,cSmall,1,8);
 		if (notcircle[i]) drawContours(rframe,contours,i,cNotCircle,1,8);
@@ -283,8 +284,8 @@ void CDMMSQI::SetDefaultConfig() {
 	Config.MSQIThreshold = 20;
 	Config.MSQISigma = 9;
 	Config.ContourMinArea = 30;
-	Config.ContourMinRoundness = 0.83;
-	Config.RingCenterMaxErr = 0.1;
+	Config.ContourMinRoundness = 0.83f;
+	Config.RingCenterMaxErr = 0.1f;
 	// Parameter ranges
 	ConfigMin.MSQIThreshold = 1;
 	ConfigMax.MSQIThreshold = 255;
@@ -292,9 +293,9 @@ void CDMMSQI::SetDefaultConfig() {
 	ConfigMax.MSQISigma = 100;
 	ConfigMin.ContourMinArea = 1;
 	ConfigMax.ContourMinArea = 1000;
-	ConfigMin.ContourMinRoundness = 0.1;
-	ConfigMax.ContourMinRoundness = 0.99;
-	ConfigMin.RingCenterMaxErr = 0.01;
+	ConfigMin.ContourMinRoundness = 0.1f;
+	ConfigMax.ContourMinRoundness = 0.99f;
+	ConfigMin.RingCenterMaxErr = 0.01f;
 	ConfigMax.RingCenterMaxErr = 10;
 	// Parameter names
 	ConfigNames.resize(DMCFG_MS_PARNUMBER);
@@ -367,7 +368,7 @@ Mat CDMMSQI::MSQIPreprocessing(InputArray src, int th, int sigma0) {
 	Mat Ilp;
 	Mat Ihp;
 	Mat Ith;
-	int pv;
+	//int pv;
 
 	Mat I = src.getMat();
 	int Itype = I.type();

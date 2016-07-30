@@ -17,6 +17,7 @@
 // -- Class declarations --------------------------------------------------------------------------
 
 #include "DetectionMethod.h"
+using namespace cv;
 
 // == CDetectionMethod: detection method base class ===============================================
 
@@ -155,7 +156,7 @@ void CDetectionMethod::drawInfoText(Mat &f,int line,string text,cv::Scalar color
 
 void CDetectionMethod::drawInfoText(Mat &f,int line,vector<string> &text,cv::Scalar color,bool shadow) {
 	// plot several consecutive lines of text with content defined in string vector
-	for (int i=0; i<text.size(); i++)
+	for (int i=0; i<(int) text.size(); i++)
 		drawInfoText(f,line+i,text[i],color,shadow);
 }
 

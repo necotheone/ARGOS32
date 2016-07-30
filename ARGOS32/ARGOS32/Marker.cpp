@@ -9,6 +9,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "Marker.h"
+using namespace cv;
 
 // == Circle implementation =======================================================================
 
@@ -78,7 +79,7 @@ CMarkerRing::CMarkerRing(CCircle &outercircle,CCircle &innercircle) {
 	Area = OuterCircle.Area - InnerCircle.Area;
 	cdx = OuterCircle.MassCenter.x+InnerCircle.MassCenter.x;
 	cdy = OuterCircle.MassCenter.y+InnerCircle.MassCenter.y;
-	Center = Point2f(cdx/2.0,cdy/2.0);
+	Center = Point2f(cdx/2.0f,cdy/2.0f);
 	cdx = OuterCircle.MassCenter.x-InnerCircle.MassCenter.x;
 	cdy = OuterCircle.MassCenter.y-InnerCircle.MassCenter.y;
 	CenterDist = sqrt(cdx*cdx + cdy*cdy);
@@ -133,12 +134,12 @@ int CMarker::RingCrId(CMarkerRing &r) {
 // ring conflicts are solved and rings are stored in the marker ring vector.
 bool CMarker::AddRing(CMarkerRing &r) {
 	bool res = false;
-	int id;
 #ifdef RINGDETECTION_OPTIMIZED
 	TmpRings.push_back(r);
 	TmpRingsNum++;
 #else
-	id = RingCrId(r);
+    int id;
+    id = RingCrId(r);
 	if (id>=0) {
 		// Check if ring was previously stored
 		if (ValidRings[id]) {
@@ -310,12 +311,12 @@ bool CMarker::CheckPointInside(Point2f p) {
 	float d2,r2;
 	bool res = true;
 
-	for (i=0; i<Rings.size(); i++) {
+	for (i=0; i<(int) Rings.size(); i++) {
 		//r = pointPolygonTest(Rings[i].InnerCircle.Contour,p,false);
 		if (ValidRings[i]) {
 			d2 = (p.x-Rings[i].Center.x)*(p.x-Rings[i].Center.x) + (p.y-Rings[i].Center.y)*(p.y-Rings[i].Center.y);
 			r2 = Rings[i].InnerCircle.CircleRadius*Rings[i].InnerCircle.CircleRadius;
-			r = r2 - d2;
+			r = (int) (r2 - d2);
 			// == LOG DEBUG ===========================
 			FILE_LOG(logDEBUG4) << "R2 = " << r2;
 			FILE_LOG(logDEBUG4) << "R  = " << Rings[i].InnerCircle.CircleRadius;
@@ -339,7 +340,7 @@ bool CMarker::CheckPointInsideTmp(Point2f p) {
 	for (i=0; i<TmpRingsNum; i++) {
 		d2 = (p.x-TmpRings[i].Center.x)*(p.x-TmpRings[i].Center.x) + (p.y-TmpRings[i].Center.y)*(p.y-TmpRings[i].Center.y);
 		r2 = TmpRings[i].InnerCircle.CircleRadius*TmpRings[i].InnerCircle.CircleRadius;
-		r = r2 - d2;
+		r = (int) (r2 - d2);
 		if (r<=0) {
 			res = false;
 			break;
@@ -373,8 +374,8 @@ CMarkerType::CMarkerType(string fname) {
 // -- Marker type methods -------------------------------------------------------------------------
 
 void CMarkerType::DefaultType() {
-	float crRef[LANDMARK_RINGNUM] = {0.50,0.65,0.75,0.85};
-	float drRef[LANDMARK_RINGNUM] = {0.1667,0.4000,0.7078,1.000};
+	float crRef[LANDMARK_RINGNUM] = {0.50f,0.65f,0.75f,0.85f};
+	float drRef[LANDMARK_RINGNUM] = {0.1667f,0.4000f,0.7078f,1.000f};
 	NumTypes = 1;
 	RingNum.resize(NumTypes);
 	Cr.resize(NumTypes);
@@ -392,7 +393,7 @@ void CMarkerType::DefaultType() {
 	CrThr[0][0] = 0.0;
 	CrThr[0][RingNum[0]] = 1.0;
 	for (int i=1; i<RingNum[0]; i++)
-		CrThr[0][i] = (Cr[0][i]+Cr[0][i-1])/2.0;
+		CrThr[0][i] = (Cr[0][i]+Cr[0][i-1])/2.0f;
 	// Initialize marker type Dr list
 	Dr[0].resize(RingNum[0]);
 	for (int i=0; i<RingNum[0]; i++)
@@ -402,7 +403,7 @@ void CMarkerType::DefaultType() {
 	DrThr[0][0] = 0.0;
 	DrThr[0][RingNum[0]] = 1.0;
 	for (int i=1; i<RingNum[0]; i++)
-		DrThr[0][i] = (Dr[0][i]+Dr[0][i-1])/2.0;
+		DrThr[0][i] = (Dr[0][i]+Dr[0][i-1])/2.0f;
 	// Initialize marker type Dr matrix
 	PopulateDrMatrix();
 }
@@ -723,7 +724,7 @@ void CLandingPad::OrganizeRings() {
 					DrmThr[0] = 0.0;
 					DrmThr[Markers[i].GetTRingNum()] = 2*Markers[i].GetTDrMVal(NormIdx,Markers[i].GetTRingNum()-1);
 					for (int n=0; n<Markers[i].GetTRingNum()-1; n++) {
-						DrmThr[n+1] = (Markers[i].GetTDrMVal(NormIdx,n)+Markers[i].GetTDrMVal(NormIdx,n+1))/2.0;
+						DrmThr[n+1] = (Markers[i].GetTDrMVal(NormIdx,n)+Markers[i].GetTDrMVal(NormIdx,n+1))/2.0f;
 					}
 					for (int n=0; n<Markers[i].GetTRingNum(); n++) {
 						// TODO: Thresholds need to be calculated and used for identification

@@ -19,7 +19,6 @@
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
-using namespace cv;
 using namespace std;
 
 // -- ARGOS Vision libraries ----------------------------------------------------------------------
@@ -48,7 +47,7 @@ using namespace std;
 class CDMMSQI : CDetectionMethod {
 public:
 	// Configuration parameters
-	typedef union tConfig {					// This union defines two ways of accessing configuration parameters
+	union tConfig {					        // This union defines two ways of accessing configuration parameters
 		struct {								// Access by variable name (internal access)
 			float    MSQIThreshold;				// Threshold used for generating binary frame from SQI image
 			float    MSQISigma;					// Sigma value (kernel size) for high-pass Gaussian filtering
@@ -65,55 +64,55 @@ public:
 	vector<bool>   ConfigTypes;				// Configuration parameter types (true for boolean flags)
 	int            ConfigNum;				// Number of configuration parameters
 	// Processing variables
-	Mat                    cameraFrame;		// Frame captured from camera/file
-	Mat                    pframe;			// Preprocessing resultant frame
-	Mat                    gframe;			// Gray scale converted frame
-	Mat                    bframe;			// Binary frame obtained by thresholding gray scale frame
-	vector<vector<Point>>  contours;		// Set of contours found in the binary frame
-	vector<Vec4i>          hierarchy;		// Hierarchy of contours
-	vector<Moments>        mu;				// Contour moments for area and length calculations
-	vector<Point2f>        mc;				// Contour mass centers
-	vector<float>          perimeter;		// Contour perimeters
-	vector<float>          roundness;		// Contour roundness
-	vector<bool>           valid;			// Indicates if contour is valid (detected as circle)
-	vector<bool>           smallSize;		// Indicates if contour is too small
-	vector<bool>           notcircle;		// Indicates if contour roundness is enough
-	vector<bool>           nohole;			// Indicates if contour has no child
-	vector<bool>           outerring;		// Indicates if contour is outer ring circle
-	vector<bool>           innerring;		// Indicates if contour is inner ring circle
+	cv::Mat                    cameraFrame;		// Frame captured from camera/file
+    cv::Mat                    pframe;			// Preprocessing resultant frame
+    cv::Mat                    gframe;			// Gray scale converted frame
+    cv::Mat                    bframe;			// Binary frame obtained by thresholding gray scale frame
+	vector<vector<cv::Point>>  contours;		// Set of contours found in the binary frame
+	vector<cv::Vec4i>          hierarchy;		// Hierarchy of contours
+	vector<cv::Moments>        mu;				// Contour moments for area and length calculations
+	vector<cv::Point2f>        mc;				// Contour mass centers
+	vector<float>              perimeter;		// Contour perimeters
+	vector<float>              roundness;		// Contour roundness
+	vector<bool>               valid;			// Indicates if contour is valid (detected as circle)
+	vector<bool>               smallSize;		// Indicates if contour is too small
+	vector<bool>               notcircle;		// Indicates if contour roundness is enough
+	vector<bool>               nohole;			// Indicates if contour has no child
+	vector<bool>               outerring;		// Indicates if contour is outer ring circle
+	vector<bool>               innerring;		// Indicates if contour is inner ring circle
 	// Detection method statistics
-	int                    nContours;		// Total number of contours found
-	int                    nCandidates;		// Number of valid contour candidates
-	int                    nSmall;			// Number of small rejected contours
-	int                    nNotCircle;		// Number of not circular rejected contours
-	int                    nNoHole;			// Number of top-level without children rejected contours
-	int                    nOuterRing;		// Number of outer ring circles detected
-	int                    nInnerRing;		// Number of inner ring circles detected
-	int                    nRings;			// Number of rings detected
+	int                        nContours;		// Total number of contours found
+	int                        nCandidates;		// Number of valid contour candidates
+	int                        nSmall;			// Number of small rejected contours
+	int                        nNotCircle;		// Number of not circular rejected contours
+	int                        nNoHole;			// Number of top-level without children rejected contours
+	int                        nOuterRing;		// Number of outer ring circles detected
+	int                        nInnerRing;		// Number of inner ring circles detected
+	int                        nRings;			// Number of rings detected
 	// Construction and destruction
 	CDMMSQI(void);
 	~CDMMSQI(void);
 	// Detection interface (implementation of virtual base methods)
-	Mat    Process(Mat &frame);					// Frame processing function
-	void   CheckKeyboard();						// Keyboard input handling
-	void   ShowInfo();							// Results and information presentation on frame
-	void   LogInfo();							// Results and information logging on console and file
-	void   ResetStatistics();					// Reset statistics variables
-	void   LogFrameStatistics();				// Log frame processing statistics
-	int    GetParNumber();						// Get the number of configuration parameters
-	float  GetParValue(int p);					// Get the value of parameter p (index)
-	string GetParName(int p);					// Get the name of parameter p (index)
-	bool   GetParType(int p);					// Get the type of parameter p (index)
-	float  GetParMax(int p);					// Get the maximum allowed value of parameter p (index)
-	float  GetParMin(int p);					// Get the minimum allowed value of parameter p (index)
-	void   SetParValue(int p, float v);			// Set the value for specified parameter 
+    cv::Mat Process(cv::Mat &frame);			// Frame processing function
+	void    CheckKeyboard();					// Keyboard input handling
+	void    ShowInfo();							// Results and information presentation on frame
+	void    LogInfo();							// Results and information logging on console and file
+	void    ResetStatistics();					// Reset statistics variables
+	void    LogFrameStatistics();				// Log frame processing statistics
+	int     GetParNumber();						// Get the number of configuration parameters
+	float   GetParValue(int p);					// Get the value of parameter p (index)
+	string  GetParName(int p);					// Get the name of parameter p (index)
+	bool    GetParType(int p);					// Get the type of parameter p (index)
+	float   GetParMax(int p);					// Get the maximum allowed value of parameter p (index)
+	float   GetParMin(int p);					// Get the minimum allowed value of parameter p (index)
+	void    SetParValue(int p, float v);		// Set the value for specified parameter 
 private:
 	// Helper functions for algorithm implementation
-	void SetDefaultConfig();					// Set default values for configuration parameters
-	void ResetDMStatistics();					// Reset method-specific statistics
-	void ResizeProcessVar(int s);				// Resize internal processing variables to the size s
-	void InitDetectionFlags();					// Initialize detection flags
-	Mat  Normalize255(const Mat& src);			// Normalize a given image into a value range between 0 and 255
-	Mat  MSQIPreprocessing(InputArray src, int th=3, int sigma0=1);
+	void     SetDefaultConfig();					// Set default values for configuration parameters
+	void     ResetDMStatistics();					// Reset method-specific statistics
+	void     ResizeProcessVar(int s);				// Resize internal processing variables to the size s
+	void     InitDetectionFlags();					// Initialize detection flags
+    cv::Mat  Normalize255(const cv::Mat& src);		// Normalize a given image into a value range between 0 and 255
+    cv::Mat  MSQIPreprocessing(cv::InputArray src, int th=3, int sigma0=1);
 };
 

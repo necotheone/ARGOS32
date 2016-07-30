@@ -12,19 +12,18 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include "Log.h"
-using namespace cv;
 using namespace std;
 
 // -- Helper definitions --------------------------------------------------------------------------
 
-#define tvContour   vector<vector<Point>>
-#define tvHierarchy vector<Vec4i>
-#define tvMoments   vector<Moments>
-#define tvMCenters  vector<Point2f>
+#define tvContour   vector<vector<cv::Point>>
+#define tvHierarchy vector<cv::Vec4i>
+#define tvMoments   vector<cv::Moments>
+#define tvMCenters  vector<cv::Point2f>
 #define tvFloat     vector<float>
 #define tvvFloat    vector<vector<float>>
-#define tContour    vector<Point>
-#define tHierarchy  Vec4i
+#define tContour    vector<cv::Point>
+#define tHierarchy  cv::Vec4i
 
 #define RINGDETECTION_OPTIMIZED
 //#define RINGDETECTION_DEBUG
@@ -40,17 +39,17 @@ using namespace std;
 class CCircle {					// Class holding recognized circles
 public:
 	// Member variables
-	vector<Point> Contour;			// Contour of circle
-	Point2f       MassCenter;		// Mass center of contour
-	float         Area;				// Contour area
-	float         Perimeter;		// Contour length
-	float         Roundness;		// Contour roundness calculated from length and area
-	RotatedRect   Ellipse;			// Bounding rectangle containing best-fitting ellipse
-	float         CircleRadius;		// Circle radius obtained from ellipse major semiaxis
-	float         Eccentricity;		// Ellipse eccentricity
+	vector<cv::Point> Contour;			// Contour of circle
+    cv::Point2f       MassCenter;		// Mass center of contour
+	float             Area;				// Contour area
+	float             Perimeter;		// Contour length
+	float             Roundness;		// Contour roundness calculated from length and area
+    cv::RotatedRect   Ellipse;			// Bounding rectangle containing best-fitting ellipse
+	float             CircleRadius;		// Circle radius obtained from ellipse major semiaxis
+	float             Eccentricity;		// Ellipse eccentricity
 	// Construction
 	CCircle();
-	CCircle(tContour &contour,Point2f &masscenter,float area,float perimeter,float roundness);
+	CCircle(tContour &contour, cv::Point2f &masscenter,float area,float perimeter,float roundness);
 	// Operator overloading
 	CCircle& operator=(const CCircle& c);
 	// Methods
@@ -60,12 +59,12 @@ public:
 class CMarkerRing {				// Class holding recognized anular markers
 public:
 	// Member variables
-	CCircle    InnerCircle;		// Inner circle
-	CCircle    OuterCircle;		// Outer circle
-	float      Area;			// Anular ring area (difference between outer and inner areas)
-	Point2f    Center;			// Ring center (mean location of inner and outer centers)
-	float      CenterDist;		// Distance between inner and outer circle centers
-	float      Cr;				// Ratio of inner to outer circle radius
+	CCircle        InnerCircle;		// Inner circle
+	CCircle        OuterCircle;		// Outer circle
+	float          Area;			// Anular ring area (difference between outer and inner areas)
+    cv::Point2f    Center;			// Ring center (mean location of inner and outer centers)
+	float          CenterDist;		// Distance between inner and outer circle centers
+	float          Cr;				// Ratio of inner to outer circle radius
 	// Construction
 	CMarkerRing();
 	CMarkerRing(CCircle &outercircle,CCircle & innercircle);
@@ -159,7 +158,7 @@ public:
 	int                 RingNum;		// Number of detected rings in marker
 	vector<CMarkerRing> Rings;			// Rings (index is the ring Id, 0 is the innermost)
 	vector<bool>        ValidRings;		// Flag indicating if ring has been detected
-	Point2f             Position;		// Marker calculated center (averaged center location of rings)
+	cv::Point2f         Position;		// Marker calculated center (averaged center location of rings)
 	float               Radius;			// Marker calculated radius (radius of the outmost ring outer circle)
 	// Marker detection confidence measures
 	float               ConfNumRings;	// Conerafidence of marker identification based on number of detected rings
@@ -178,8 +177,8 @@ public:
 	// Marker structure
 	bool  AddRing(CMarkerRing &r);				// Calculates the ring id and adds it to the marker
 	void  RemoveRings();						// Removes all rings stored in the marker
-	bool  CheckPointInside(Point2f p);			// Check if p is inside all the rings contained in marker
-	bool  CheckPointInsideTmp(Point2f p);		// Check if p is inside all the temporal rings stored in marker
+	bool  CheckPointInside(cv::Point2f p);		// Check if p is inside all the rings contained in marker
+	bool  CheckPointInsideTmp(cv::Point2f p);	// Check if p is inside all the temporal rings stored in marker
 	// Confidence measures and characteristics
 	float CalcRingCrCM(int i);					// Calculates Cr confidence measure for the ring identified by its index
 	float CalcRingCrCM(int i,float Cr);			// Calculates Cr confidence measure for the ring position i with specified Cr value

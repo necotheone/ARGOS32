@@ -119,12 +119,25 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ARGOSLandingPad.cpp" />
+    <ClCompile Include="DetectionEngine.cpp" />
+    <ClCompile Include="DetectionMethod.cpp" />
+    <ClCompile Include="DMMSQI.cpp" />
+    <ClCompile Include="DMThresholdContour.cpp" />
     <ClCompile Include="Marker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Definitions.h" />
+    <ClInclude Include="DetectionEngine.h" />
+    <ClInclude Include="DetectionMethod.h" />
+    <ClInclude Include="DMIdentifiers.h" />
+    <ClInclude Include="DMMSQI.h" />
+    <ClInclude Include="DMThresholdContour.h" />
+    <ClInclude Include="Log.h" />
     <ClInclude Include="Marker.h" />
     <ClInclude Include="Profiling.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ARGOSMarkerTypesV2.yml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

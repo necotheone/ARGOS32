@@ -16,6 +16,15 @@
     <Filter Include="Ficheros de configuración">
       <UniqueIdentifier>{11e78c08-ee40-459a-a0ec-e8b2aa2b8866}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Librería EasyLogging">
+      <UniqueIdentifier>{8048e31b-7948-4a92-a726-d894ed8b9564}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Información de proyecto">
+      <UniqueIdentifier>{b090c142-b6fd-4993-98a9-86356803a59f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logs">
+      <UniqueIdentifier>{b5432798-9057-4f3d-98b9-bbb6dcfec3c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ARGOSLandingPad.cpp">
@@ -65,10 +74,33 @@
     <ClInclude Include="Log.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="EasyLogging\easylogging++.h">
+      <Filter>Librería EasyLogging</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ARGOSMarkerTypesV2.yml">
       <Filter>Ficheros de configuración</Filter>
     </None>
+    <None Include="EasyLogging\EasyLogging.md">
+      <Filter>Librería EasyLogging</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ARGOSLoggingConfig.txt">
+      <Filter>Ficheros de configuración</Filter>
+    </Text>
+    <Text Include="ChangeLog.txt">
+      <Filter>Información de proyecto</Filter>
+    </Text>
+    <Text Include="ARGOSLandingPad.log">
+      <Filter>Logs</Filter>
+    </Text>
+    <Text Include="DML-MSQI.log">
+      <Filter>Logs</Filter>
+    </Text>
+    <Text Include="DML-Threshold.log">
+      <Filter>Logs</Filter>
+    </Text>
   </ItemGroup>
 </Project>

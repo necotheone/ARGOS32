@@ -1,0 +1,25 @@
+ARGOSLandingPad Change Log
+Initial source revision: 2.0 from ARGOSVision repository (Bitbucket)
+-------------------------------------------------------------------------------
+Legend for planned changes:
+  Rev - Target revision (changes can be planned for not-immediate revisions)
+  D   - Done, implemented in code
+  T   - Tested, implemented change has been successfully verified
+  P   - (T or D value) Work in progress, started but not finished
+  *   - (T or D value) Work complete (done or tested)
+Changes done and verified are moved to applied changes if and only if the code
+is commited to the project repository with its revision label (Revision-NN).
+===============================================================================
+
+PLANNED CHANGES ===============================================================
+  Rev  D   T  Description
+  --- --- --- -----------------------------------------------------------------
+  03   P      Replace log with EasyLogging library to allow logging into
+              different log files for different detection methods.
+  03   *   *  Add configuration files and folders to Visual Studio project.
+
+APPLIED CHANGES ===============================================================
+
+Revision 02 - 2016.07.30
+  1. Namespace directives (using namespace cv) moved to source files to avoid
+     type conflicts between OpenCV and Windows sources.

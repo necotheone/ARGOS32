@@ -132,12 +132,21 @@
     <ClInclude Include="DMIdentifiers.h" />
     <ClInclude Include="DMMSQI.h" />
     <ClInclude Include="DMThresholdContour.h" />
+    <ClInclude Include="EasyLogging\easylogging++.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Marker.h" />
     <ClInclude Include="Profiling.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ARGOSMarkerTypesV2.yml" />
+    <None Include="EasyLogging\EasyLogging.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ARGOSLandingPad.log" />
+    <Text Include="ARGOSLoggingConfig.txt" />
+    <Text Include="ChangeLog.txt" />
+    <Text Include="DML-MSQI.log" />
+    <Text Include="DML-Threshold.log" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

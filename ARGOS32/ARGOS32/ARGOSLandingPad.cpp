@@ -24,6 +24,12 @@
 #include <iostream>
 #include <string>
 
+// -- Logging library -----------------------------------------------------------------------------
+
+#include "EasyLogging\easylogging++.h"
+
+INITIALIZE_EASYLOGGINGPP
+
 // -- ARGOS Vision libraries ----------------------------------------------------------------------
 
 #include "DMIdentifiers.h"
@@ -439,6 +445,9 @@ int main( int argc, char** argv ) {
 	cout << "Profiling is applied to frame processing, excluding results presentation" << endl;
 	cout << endl;
 	cout << "Video source opened" << endl << endl;
+    // -- Setup logging -----------------------------------
+    el::Loggers::configureFromGlobal("ARGOSLoggingConfig.txt");
+    CLOG(DEBUG, "DMMSQI") << "Testing Easy Logging library";
 	// -- Configure detection engine ----------------------
 	ConfigDetectionEngine();
 	// -- Create windows ----------------------------------

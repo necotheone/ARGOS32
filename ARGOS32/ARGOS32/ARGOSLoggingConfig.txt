@@ -1,0 +1,92 @@
+## ARGOS Logging configuration file
+## Rev.: 01
+## Date: 2016.07.31
+## ----------------------------------------------------------------------------
+## Refer to EasyLogging.md for detailed information on Easy Logging usage
+## and configuration file syntax.
+##
+## Syntax highlights:
+## - Comments start with two hashes (#)
+## - Comments can be placed after valid code (using two hashes to start)
+## - The configuration file includes library-provided and custom loggers
+## - Each logger groups all its configuration parameters for all levels
+## - Each logger configuration starts with a line with two dashes and 
+##   the logger ID (for example, -- default)
+## - For each logger, configured levels start with an asterisc
+## - All loggers configure the GLOBAL level first; other levels use
+##   the logger global configuration if not explicitly changed
+##
+## Available levels:
+## - GLOBAL   Represents all levels (mainly for configuration)
+## - TRACE
+## - DEBUG
+## - FATAL
+## - ERROR
+## - WARNING
+## - INFO
+## - VERBOSE  Not applicable to hierarchical logging
+## - UNKNOWN  Only for hierarchical logging, used to generate no logs
+## ----------------------------------------------------------------------------
+
+## Default logger
+-- default
+* GLOBAL:
+   FORMAT               =  "%datetime %msg"
+   FILENAME             =  "ARGOSLandingPad.log"
+   ENABLED              =  false
+   TO_FILE              =  false
+   TO_STANDARD_OUTPUT   =  false
+   MILLISECONDS_WIDTH   =  6
+   PERFORMANCE_TRACKING =  true
+   MAX_LOG_FILE_SIZE    =  2097152   ## 2MB
+   LOG_FLUSH_THRESHOLD  =  100       ## Flush after every 100 logs
+* DEBUG:
+   FORMAT               = "%datetime{%d/%M} %func %msg"
+
+## Performance logger
+-- performance
+* GLOBAL:
+   FORMAT               =  "%datetime %msg"
+   FILENAME             =  "ARGOSLandingPad.log"
+   ENABLED              =  false
+   TO_FILE              =  false
+   TO_STANDARD_OUTPUT   =  false
+   MILLISECONDS_WIDTH   =  6
+   PERFORMANCE_TRACKING =  true
+   MAX_LOG_FILE_SIZE    =  2097152
+   LOG_FLUSH_THRESHOLD  =  100
+* DEBUG:
+   FORMAT               = "%datetime{%d/%M} %func %msg"
+
+## Threshold detection method logger
+-- DMThreshold
+* GLOBAL:
+   FORMAT               =  "%datetime %msg"
+   FILENAME             =  "DML-Threshold.log"
+   ENABLED              =  false
+   TO_FILE              =  false
+   TO_STANDARD_OUTPUT   =  false
+   MILLISECONDS_WIDTH   =  6
+   PERFORMANCE_TRACKING =  true
+   MAX_LOG_FILE_SIZE    =  2097152
+   LOG_FLUSH_THRESHOLD  =  100
+* DEBUG:
+   FORMAT               = "%datetime{%d/%M} %func %msg"
+
+## MSQI detection method logger
+-- DMMSQI
+* GLOBAL:
+   FORMAT               =  "%datetime %msg"
+   FILENAME             =  "DML-MSQI.log"
+   ENABLED              =  false
+   TO_FILE              =  false
+   TO_STANDARD_OUTPUT   =  false
+   MILLISECONDS_WIDTH   =  6
+   PERFORMANCE_TRACKING =  true
+   MAX_LOG_FILE_SIZE    =  2097152
+   LOG_FLUSH_THRESHOLD  =  100
+* DEBUG:
+   FORMAT               = "%datetime{%Y.%M.%d %H:%m:%s.%g} %func %msg"
+   ENABLED              =  true
+   TO_FILE              =  true
+   MILLISECONDS_WIDTH   =  3

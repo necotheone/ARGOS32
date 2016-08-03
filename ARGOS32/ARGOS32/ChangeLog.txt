@@ -14,10 +14,13 @@ is commited to the project repository with its revision label (Revision-NN).
 PLANNED CHANGES ===============================================================
   Rev  D   T  Description
   --- --- --- -----------------------------------------------------------------
-  03   P      Replace log with EasyLogging library to allow logging into
+  03   *   *  Replace log with EasyLogging library to allow logging into
               different log files for different detection methods.
-  03   P      Modify CDetectionMethod log methods to use EasyLogging.
+  03   *   *  Modify CDetectionMethod log methods to use EasyLogging.
   03   *   *  Add configuration files and folders to Visual Studio project.
+  03   *   *  Add support for processing image files (detected by extension)
+  03   *   *  Include a folder with test images and videos
+  03          Add keyboard commands to select the input (camera and test files)
 
 APPLIED CHANGES ===============================================================
 

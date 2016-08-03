@@ -61,7 +61,7 @@ void CCircle::CalcEllipse() {
 	a = Ellipse.size.height/2;		// Major semiaxis
 	b = Ellipse.size.width/2;		// Minor semiaxis
 	// == LOG DEBUG ===========================
-	CLOG(TRACE, "default") << "ELLIPSE " << a << "," << b;
+	//CLOG(TRACE, "default") << "ELLIPSE " << a << "," << b;
 	// ========================================
 	Eccentricity = sqrt(1-(b/a)*(b/a));
 	CircleRadius = a;

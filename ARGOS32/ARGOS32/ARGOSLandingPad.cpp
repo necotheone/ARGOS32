@@ -106,7 +106,10 @@ int          wlines = 0;				// Results window number of lines
 
 VideoCapture Capture;					// Capture device (camera or video) for retrieving frames
 Mat          cframe;					// Captured frame
+const char*  inputFilename = 0;         // Input file name
+const char*  inputFileExt = 0;          // Input file extension
 bool         liveCapture = false;		// Indicates if input comes from camera (true) or file
+bool         inputIsImg = false;        // Indicates if input file is an image (true)
 bool         goProcessing = false;		// Indicates if processing is active (true)
 bool         Quit = false;				// Flag to trigger finishing the application
 
@@ -120,7 +123,7 @@ public:
     CLogHelper() {
         // -- Setup logging -----------------------------------
         el::Loggers::configureFromGlobal("ARGOSLoggingConfig.txt");
-        LOG(DEBUG) << "Logging framework initialized from ARGOSLoggingConfig.txt";
+        LOG(INFO) << "Logging framework initialized from ARGOSLoggingConfig.txt";
     }
 };
 
@@ -196,27 +199,45 @@ void CreateFrameWindows(bool isProcActive) {
 	int flags = CV_WINDOW_NORMAL | CV_WINDOW_KEEPRATIO | CV_GUI_EXPANDED;
 	if (!IsOpenedWndRes) {
 		namedWindow(ALP_RESULTSWND,flags);
-		Capture.read(cframe);
+        if (!inputIsImg)
+    		Capture.read(cframe);
+        else {
+            cframe = imread(inputFilename);
+            if (!cframe.data) {
+                LOG(ERROR) << format("Error reading %s image", inputFilename);
+            }
+        }
 		int ix = cframe.cols;
 		int iy = cframe.rows;
 		wlines = (int) (iy/DMGUI_LINEHEIGHT)-1;
 		float imf = (float) iy/(float) ix;
 		wx = (CAPTUREWINDOW_WIDTH == -1 ? ix : CAPTUREWINDOW_WIDTH);
 		wy = (CAPTUREWINDOW_WIDTH == -1 ? iy : (int) ((float) wx*imf));
-		resizeWindow(ALP_RESULTSWND,wx,wy);
+        if (!liveCapture)
+            Capture.set(CAP_PROP_POS_FRAMES, 0);
+        resizeWindow(ALP_RESULTSWND,wx,wy);
 		moveWindow(ALP_RESULTSWND,10,10);
 		IsOpenedWndRes = true;
 	}
 	if (isProcActive && !IsOpenedWndPrc) {
 		if (wx==0 || wy==0) {
-			Capture.read(cframe);
-			int ix = cframe.cols;
+            if (!inputIsImg)
+                Capture.read(cframe);
+            else {
+                cframe = imread(inputFilename);
+                if (!cframe.data) {
+                    LOG(ERROR) << format("Error reading %s image", inputFilename);
+                }
+            }
+            int ix = cframe.cols;
 			int iy = cframe.rows;
 			wlines = (int) (iy/DMGUI_LINEHEIGHT)-1;
 			float imf = (float) iy/(float) ix;
 			wx = (CAPTUREWINDOW_WIDTH == -1 ? ix : CAPTUREWINDOW_WIDTH);
 			wy = (CAPTUREWINDOW_WIDTH == -1 ? iy : (int) ((float) wx*imf));
-		}
+            if (!liveCapture)
+                Capture.set(CAP_PROP_POS_FRAMES, 0);
+        }
 		namedWindow(ALP_PROCESSWND,flags);
 		resizeWindow(ALP_PROCESSWND,wx,wy);
 		moveWindow(ALP_PROCESSWND,10+(wx+25),10);
@@ -380,10 +401,33 @@ bool CheckKeyboard() {
 	return Quit;
 }
 
+// -- Helper functions ----------------------------------------------------------------------------
+
+const char *getFilenameExt(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if (!dot || dot == filename) return "";
+    return dot + 1;
+}
+
+const char *imgFormats[13] = {
+    "BMP", "DIB", "JPEG", "JPG", "JPE", "JP2", "PNG", "PBM", "PGM", "SR", "RAS", "TIFF", "TIF"
+};
+
+bool isImage(const char *filename) {
+    bool res = false;
+    const char *ext = getFilenameExt(filename);
+    for (int i = 0; i < sizeof(imgFormats); i++) {
+        if (!_strcmpi(ext, imgFormats[i])) {
+            res = true;
+            break;
+        }
+    }
+    return res;
+}
+
 // -- Main program --------------------------------------------------------------------------------
 
 int main( int argc, char** argv ) {
-    const char* inputFilename = 0;
 	int i;
 	int cameraId = 0;
 
@@ -399,39 +443,50 @@ int main( int argc, char** argv ) {
 		if (s[0] != '-') {
             if (isdigit(s[0]))
                 sscanf(s, "%d", &cameraId);
-            else
+            else {
                 inputFilename = s;
+                inputIsImg = isImage(s);
+            }
         }
 		else {
 			ShowAppHelp();
-			cerr << format("ERROR: Unknown option %s",s) << endl;
-			return -1;
+            cerr << format("ERROR: Unknown option %s", s) << endl;
+            LOG(ERROR) << format("ERROR: Unknown option %s", s);
+            return -1;
 		}
     }
 	// -- Open video source -------------------------------
     if (inputFilename) {
-        Capture.open(inputFilename);
+        if (!inputIsImg)
+            Capture.open(inputFilename);
 		liveCapture = false;
 	}
     else {
         Capture.open(cameraId);
 		liveCapture = true;
 	}
-    if (!Capture.isOpened()) {
-		cerr << format("Could not initialize video (%d) capture\n",cameraId) << endl;
-		return -2;
+    if (!Capture.isOpened() && !inputIsImg) {
+        cerr << format("Could not initialize video (%d) capture\n", cameraId) << endl;
+        LOG(ERROR) << format("Could not initialize video (%d) capture\n", cameraId);
+        return -2;
 	}
 	if (liveCapture)
 		ShowLiveCaptureHelp();
 	else
 		ShowVideoFileHelp();
 	ShowParKeyHelp();
-	// TODO: Change following output to log
-	cout << endl;
-	cout << "Profiling is applied to frame processing, excluding results presentation" << endl;
-	cout << endl;
-	cout << "Video source opened" << endl << endl;
-	// -- Configure detection engine ----------------------
+	// Log succcessful initialization
+	LOG(INFO) << "Profiling is applied to frame processing, excluding results presentation";
+    cout << endl;
+    if (!inputIsImg) {
+        cout << "Video source opened" << endl << endl;
+        LOG(INFO) << "Video source opened";
+    }
+    else {
+        cout << "Input is a single image" << endl << endl;
+        LOG(INFO) << "Input is a single image";
+    }
+    // -- Configure detection engine ----------------------
 	ConfigDetectionEngine();
 	// -- Create windows ----------------------------------
 	CreateFrameWindows(goProcessing);
@@ -448,20 +503,40 @@ int main( int argc, char** argv ) {
 				imshow(ALP_RESULTSWND,DetectionEngine.GetResultsFrame());
 				imshow(ALP_PROCESSWND,DetectionEngine.GetProcessFrame());
 			}
-			// If input comes from video file, run while there are frames available
+			// If input comes from file, run while there are frames available
 			else {
-				if (Capture.read(cframe)) {
-					DetectionEngine.Process(cframe);
-					DetectionEngine.ShowInfo();
-					DetectionEngine.LogInfo();
-					ShowControlInfo(cframe);
-					imshow(ALP_RESULTSWND,DetectionEngine.GetResultsFrame());
-					imshow(ALP_PROCESSWND,DetectionEngine.GetProcessFrame());
-				}
-				// No more frames available
-				else {
-					goProcessing = false;
-				}
+                // Input is a single image
+                if (inputIsImg) {
+                    cframe = imread(inputFilename);
+                    if (cframe.data) {
+                        DetectionEngine.Process(cframe);
+                        DetectionEngine.ShowInfo();
+                        DetectionEngine.LogInfo();
+                        ShowControlInfo(cframe);
+                        imshow(ALP_RESULTSWND, DetectionEngine.GetResultsFrame());
+                        imshow(ALP_PROCESSWND, DetectionEngine.GetProcessFrame());
+                    }
+                    else {
+                        LOG(ERROR) << format("Error reading %s image", inputFilename);
+                    }
+                    // Only one frame available: stop processing
+                    goProcessing = false;
+                }
+                else {
+                    // Input is a video file
+                    if (Capture.read(cframe)) {
+                        DetectionEngine.Process(cframe);
+                        DetectionEngine.ShowInfo();
+                        DetectionEngine.LogInfo();
+                        ShowControlInfo(cframe);
+                        imshow(ALP_RESULTSWND, DetectionEngine.GetResultsFrame());
+                        imshow(ALP_PROCESSWND, DetectionEngine.GetProcessFrame());
+                    }
+                    // No more frames available
+                    else {
+                        goProcessing = false;
+                    }
+                }
 			}
 		}
 		// If processing is not active

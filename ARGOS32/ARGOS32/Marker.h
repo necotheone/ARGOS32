@@ -11,7 +11,6 @@
 #pragma once
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
-#include "Log.h"
 using namespace std;
 
 // -- Helper definitions --------------------------------------------------------------------------
@@ -24,6 +23,7 @@ using namespace std;
 #define tvvFloat    vector<vector<float>>
 #define tContour    vector<cv::Point>
 #define tHierarchy  cv::Vec4i
+#define tCStr       const char *
 
 #define RINGDETECTION_OPTIMIZED
 //#define RINGDETECTION_DEBUG
@@ -168,8 +168,10 @@ public:
 	// Helper members
 	int                 TmpRingsNum;	// Number of rings added but not assigned
 	vector<CMarkerRing> TmpRings;		// Rings added to the marker, but not assigned to marker structure
+    // Logging
+    string              LoggerName;     // Logger to be used with this CMarker instance
 	// Construction
-	CMarker(CMarkerType* mt);
+	CMarker(CMarkerType* mt, string logger);
 	// Methods
 private:
 	int   RingCrId(CMarkerRing &r);				// Get the ring id based on its radius ratio Cr
@@ -210,7 +212,8 @@ public:
 	tvFloat  GetTDrMRow(int r)         { return MarkerType->GetDrMRow(TypeId,r); }
 	float    GetTDrMVal(int r,int c)   { return MarkerType->GetDrMVal(TypeId,r,c); }
 	// Marker information display
-	void  ShowMarkerInfo();						// Shows information on marker characteristics
+    tCStr Logger();                 // Get the logger name
+    void  ShowMarkerInfo();			// Shows information on marker characteristics
 };
 
 // -- Landpad class -------------------------------------------------------------------------------
@@ -226,12 +229,15 @@ public:
 	// Landing pad detection
 	int                NumMarkers;		// Number of detected markers
 	vector<CMarker>    Markers;			// List of detected markers
+    // Logging
+    string             LoggerName;      // Logger to be used for this CLandingPad instance
 	// Construction
 	CLandingPad();
 	// Methods
-	void Reset();						// Reinitialize landing pad instance
-	bool AddRing(CMarkerRing &r);		// Add a new ring checking hierarchy
+	void  Reset();						// Reinitialize landing pad instance
+	bool  AddRing(CMarkerRing &r);		// Add a new ring checking hierarchy
 	void  OrganizeRings();				// Organize added rings into the marker structure
-	void ShowLandingPadInfo();			// Show information on landing pad detected characteristics
+    tCStr Logger();                     // Get the logger name
+    void  ShowLandingPadInfo();	        // Show information on landing pad detected characteristics
 };
 

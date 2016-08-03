@@ -20,6 +20,11 @@
 // -- Class declarations --------------------------------------------------------------------------
 
 #include "DMMSQI.h"
+
+// -- Logging library -----------------------------------------------------------------------------
+
+#include "EasyLogging\easylogging++.h"
+
 using namespace cv;
 
 // -- Construction and destruction ----------------------------------------------------------------
@@ -40,7 +45,8 @@ CDMMSQI::~CDMMSQI(void) {
 Mat CDMMSQI::Process(Mat &frame) {
 	unsigned int i;
 
-	Profiling.Start(PROFILE_TIMER1);
+    CLOG(INFO, Logger()) << format("Processing frame %05d", nFrames+1) << " with " << DMName;
+    Profiling.Start(PROFILE_TIMER1);
 	// Convert captured frame to gray scale
 	cvtColor(frame,gframe,CV_RGB2GRAY);
 	// Get binary image from MSQI processing
@@ -116,7 +122,8 @@ Mat CDMMSQI::Process(Mat &frame) {
 						bool r = LandingPad.AddRing(MarkerRing);
 						// == LOG INFO ===========================================
 						string msg = format("RING FOUND %02d (%3.0f,%3.0f) - %02d (%3.0f,%3.0f)",i,mc[i].x,mc[i].y,ih,mc[ih].x,mc[ih].y);
-						FILE_LOG(logDEBUG2) << msg;
+						//FILE_LOG(logDEBUG2) << msg;
+                        CLOG(TRACE, Logger()) << msg;
 						// =======================================================
 					}
 					ih = hierarchy[ih][0];
@@ -134,7 +141,6 @@ Mat CDMMSQI::Process(Mat &frame) {
 	Profiling.Stop(PROFILE_TIMER1);
 	nFrames++;
 	TotProcTime = TotProcTime+Profiling.GetTime(PROFILE_TIMER1);
-	//ShowFrameStatistics();
 	// Save frames for showing information
 	ResultsFrame = frame;
 	ProcessFrame = bframe;
@@ -198,6 +204,7 @@ void CDMMSQI::ShowInfo() {
 
 void CDMMSQI::LogInfo() {
 	// Results and information logging on console and file
+    LogFrameStatistics();
 	LandingPad.ShowLandingPadInfo();
 }
 
@@ -213,7 +220,7 @@ void CDMMSQI::LogFrameStatistics() {
 	string msg;
 
 	msg = format("%05d : %3.1f - Contours: %04d - V(%03d) S(%03d) C(%03d) N(%03d) IR(%02d) OR(%02d)",nFrames,TotProcTime*1000.0/nFrames,nContours,nCandidates,nSmall,nNotCircle,nNoHole,nInnerRing,nOuterRing);
-	FILE_LOG(logINFO) << msg;
+    CLOG(INFO, Logger()) << msg;
 }
 
 int CDMMSQI::GetParNumber() {

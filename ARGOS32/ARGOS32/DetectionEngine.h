@@ -28,7 +28,6 @@
 #include "DMIdentifiers.h"
 #include "Profiling.h"
 #include "Marker.h"
-#include "Log.h"
 
 // -- Detection methods ---------------------------------------------------------------------------
 

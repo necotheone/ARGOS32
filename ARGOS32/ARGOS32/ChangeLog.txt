@@ -16,6 +16,7 @@ PLANNED CHANGES ===============================================================
   --- --- --- -----------------------------------------------------------------
   03   P      Replace log with EasyLogging library to allow logging into
               different log files for different detection methods.
+  03   P      Modify CDetectionMethod log methods to use EasyLogging.
   03   *   *  Add configuration files and folders to Visual Studio project.
 
 APPLIED CHANGES ===============================================================

@@ -8,7 +8,14 @@
 // References: See full description and references in ARGOSLandingPad.cpp
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// -- Class declarations --------------------------------------------------------------------------
+
 #include "Marker.h"
+
+// -- Logging library -----------------------------------------------------------------------------
+
+#include "EasyLogging\easylogging++.h"
+
 using namespace cv;
 
 // == Circle implementation =======================================================================
@@ -54,7 +61,7 @@ void CCircle::CalcEllipse() {
 	a = Ellipse.size.height/2;		// Major semiaxis
 	b = Ellipse.size.width/2;		// Minor semiaxis
 	// == LOG DEBUG ===========================
-	FILE_LOG(logDEBUG3) << "ELLIPSE " << a << "," << b;
+	CLOG(TRACE, "default") << "ELLIPSE " << a << "," << b;
 	// ========================================
 	Eccentricity = sqrt(1-(b/a)*(b/a));
 	CircleRadius = a;
@@ -93,7 +100,7 @@ CMarkerRing::CMarkerRing(CCircle &outercircle,CCircle &innercircle) {
 
 // -- Construction --------------------------------------------------------------------------------
 
-CMarker::CMarker(CMarkerType* mt) {
+CMarker::CMarker(CMarkerType* mt, string logger) {
 	// Initialize marker characteristics
 	MarkerType = mt;
 	TypeId = 0;
@@ -109,6 +116,8 @@ CMarker::CMarker(CMarkerType* mt) {
 #ifdef RINGDETECTION_OPTIMIZED
 	TmpRingsNum=0;
 #endif
+    // Setup logging
+    LoggerName = logger;
 }
 
 // -- Landing pad marker methods ------------------------------------------------------------------
@@ -145,7 +154,7 @@ bool CMarker::AddRing(CMarkerRing &r) {
 		if (ValidRings[id]) {
 			// TODO: Handle error messages properly
 			// == LOG DEBUG ===========================
-			FILE_LOG(logDEBUG4) << format("DEL RING - ID[%d] CR[%01.3f]",id,r.Cr);
+            CLOG(TRACE, Logger()) << format("DEL RING - ID[%d] CR[%01.3f]",id,r.Cr);
 			// ========================================
 		}
 		else {
@@ -158,7 +167,7 @@ bool CMarker::AddRing(CMarkerRing &r) {
 			res = true;
 			// TODO: Remove when done
 			// == LOG DEBUG ===========================
-			FILE_LOG(logDEBUG4) << format("ADD RING - ID[%d] RN[%d] CR[%01.3f]",id,RingNum,Rings[id].Cr);
+            CLOG(TRACE, Logger()) << format("ADD RING - ID[%d] RN[%d] CR[%01.3f]",id,RingNum,Rings[id].Cr);
 			// ========================================
 		}
 	}
@@ -286,9 +295,14 @@ void CMarker::CalcRadius() {
 	}
 }
 
+// Get the logger name
+tCStr CMarker::Logger() {
+    return LoggerName.c_str();
+}
+
 // Shows information on marker characteristics
 void CMarker::ShowMarkerInfo() {
-	FILE_LOG(logINFO) << format("LPM INFO - N[%d] P(%1.3f,%1.3f) Conf { NR[%1.3f] Cr[%1.3f] Dr[%1.3f] MC[%1.3f] }",RingNum,Position.x,Position.y,ConfNumRings,ConfCr,ConfDr,ConfCenter);
+    CLOG(INFO, Logger()) << format("LPM INFO - N[%d] P(%1.3f,%1.3f) Conf { NR[%1.3f] Cr[%1.3f] Dr[%1.3f] MC[%1.3f] }", RingNum, Position.x, Position.y, ConfNumRings, ConfCr, ConfDr, ConfCenter);
 	for (int i=0; i<MarkerType->RingNum[TypeId]; i++) {
 		string msg = format("      RING %d ",i);
 		string msg1, msg2;
@@ -296,13 +310,13 @@ void CMarker::ShowMarkerInfo() {
 			msg = msg + format("C(%1.3f,%1.3f) CD[%3.1f] Ar[%3.1f] Cr[%1.3f]",Rings[i].Center.x,Rings[i].Center.y,Rings[i].CenterDist,Rings[i].Area,Rings[i].Cr);
 			msg1 = format("       INNER C(%1.3f,%1.3f) Rd[%3.1f] Pe[%3.1f] Ar[%3.1f] Rn[%1.3f] Ec[%1.3f]",Rings[i].InnerCircle.MassCenter.x,Rings[i].InnerCircle.MassCenter.y,Rings[i].InnerCircle.CircleRadius,Rings[i].InnerCircle.Perimeter,Rings[i].InnerCircle.Area,Rings[i].InnerCircle.Roundness,Rings[i].InnerCircle.Eccentricity);
 			msg2 = format("       OUTER C(%1.3f,%1.3f) Rd[%3.1f] Pe[%3.1f] Ar[%3.1f] Rn[%1.3f] Ec[%1.3f]",Rings[i].OuterCircle.MassCenter.x,Rings[i].OuterCircle.MassCenter.y,Rings[i].OuterCircle.CircleRadius,Rings[i].OuterCircle.Perimeter,Rings[i].OuterCircle.Area,Rings[i].OuterCircle.Roundness,Rings[i].OuterCircle.Eccentricity);
-			FILE_LOG(logINFO1) << msg;
-			FILE_LOG(logINFO1) << msg1;
-			FILE_LOG(logINFO1) << msg2;
-		}
+            CLOG(INFO, Logger()) << msg;
+            CLOG(INFO, Logger()) << msg1;
+            CLOG(INFO, Logger()) << msg2;
+        }
 		else
-			FILE_LOG(logINFO1) << msg;
-	}
+            CLOG(INFO, Logger()) << msg;
+    }
 }
 
 // Check if point p is inside all the rings contained in marker
@@ -318,9 +332,9 @@ bool CMarker::CheckPointInside(Point2f p) {
 			r2 = Rings[i].InnerCircle.CircleRadius*Rings[i].InnerCircle.CircleRadius;
 			r = (int) (r2 - d2);
 			// == LOG DEBUG ===========================
-			FILE_LOG(logDEBUG4) << "R2 = " << r2;
-			FILE_LOG(logDEBUG4) << "R  = " << Rings[i].InnerCircle.CircleRadius;
-			FILE_LOG(logDEBUG4) << "D2 = " << d2;
+            CLOG(TRACE, Logger()) << "R2 = " << r2;
+            CLOG(TRACE, Logger()) << "R  = " << Rings[i].InnerCircle.CircleRadius;
+            CLOG(TRACE, Logger()) << "D2 = " << d2;
 			// ========================================
 			if (r<=0) {
 				res = false;
@@ -428,8 +442,8 @@ bool CMarkerType::Load(string fname) {
 		FileStorage fs(fname,FileStorage::READ);
 		fs["Version"] >> v;
 		if (v!=ConfVersion) {
-			FILE_LOG(logWARNING) << "CONFIG ERROR: Configuration file version does not match current version";
-			FILE_LOG(logWARNING) << "              Loading default marker configuration";
+			LOG(WARNING) << "CONFIG ERROR: Configuration file version does not match current version";
+			LOG(WARNING) << "              Loading default marker configuration";
 			DefaultType();
 			return false;
 		}
@@ -457,25 +471,25 @@ bool CMarkerType::Load(string fname) {
 		fs.release();
 		// == LOG DEBUG ===========================
 		// TODO: Remove when checking load finishes
-		FILE_LOG(logDEBUG4) << "Configuration loaded, version " << format("%02d",v);
-		FILE_LOG(logDEBUG4) << "Number of types: " << NumTypes;
+        LOG(TRACE) << "Configuration loaded, version " << format("%02d",v);
+        LOG(TRACE) << "Number of types: " << NumTypes;
 		for (int i=0; i<NumTypes; i++) {
-			FILE_LOG(logDEBUG4) << "Structure " << i << ": " << RingNum[i] << " rings";
+            LOG(TRACE) << "Structure " << i << ": " << RingNum[i] << " rings";
 			string msg = "Cr:    ";
 			for (int j=0; j<RingNum[i]; j++)
 				msg += format("%1.3f ",Cr[i][j]);
-			FILE_LOG(logDEBUG4) << msg;
+            LOG(TRACE) << msg;
 			msg = "CrThr: ";
 			for (int j=0; j<RingNum[i]+1; j++)
 				msg += format("%1.3f ",CrThr[i][j]);
-			FILE_LOG(logDEBUG4) << msg;
+            LOG(TRACE) << msg;
 		}
 		// ========================================
 	}
 	catch( cv::Exception& e ) {
 		const char* err_msg = e.what();
 		// == LOG DEBUG ===========================
-		FILE_LOG(logERROR) << "Exception caught: " << err_msg;
+        LOG(ERROR) << "Exception caught: " << err_msg;
 		// ========================================
 	}
 	return true;
@@ -542,14 +556,14 @@ bool CLandingPad::AddRing(CMarkerRing &r) {
 		if (Markers[i].CheckPointInsideTmp(r.Center)) {
 			isInsideIdx = i;
 			// == LOG DEBUG ===========================
-			FILE_LOG(logDEBUG3) << format("RING C(%3.1f,%3.1f) INSIDE MARKER %d",r.Center.x,r.Center.y,i);
+            CLOG(TRACE, Logger()) << format("RING C(%3.1f,%3.1f) INSIDE MARKER %d",r.Center.x,r.Center.y,i);
 			// ========================================
 			break;
 		}
 	}
 	// If it is not inside any marker, create a new one
 	if (isInsideIdx==-1) {
-		Markers.push_back(CMarker(&MarkerTypeDef));
+        Markers.push_back(CMarker(&MarkerTypeDef, LoggerName));
 		NumMarkers++;
 		res = Markers[NumMarkers-1].AddRing(r);
 	}
@@ -568,12 +582,12 @@ void CLandingPad::OrganizeRings() {
 	for (i=0; i<NumMarkers; i++) {
 		// == LOG DEBUG ===========================
 		#ifdef RINGDETECTION_DEBUG
-		FILE_LOG(logDEBUG) << "ORGANIZING MARKER " << i;
-		FILE_LOG(logDEBUG) << "  " << Markers[i].TmpRingsNum << " DETECTED";
+        CLOG(TRACE, Logger()) << "ORGANIZING MARKER " << i;
+        CLOG(TRACE, Logger()) << "  " << Markers[i].TmpRingsNum << " DETECTED";
 		vector<CMarkerRing>::iterator its = Markers[i].TmpRings.begin();
 		j=0;
 		while (its!=Markers[i].TmpRings.end()) {
-			FILE_LOG(logDEBUG) << format("  RING %d - R[%3.1f]",j,(*its).OuterCircle.CircleRadius);
+            CLOG(TRACE, Logger()) << format("  RING %d - R[%3.1f]",j,(*its).OuterCircle.CircleRadius);
 			j++;
 			its++;
 		}
@@ -583,11 +597,11 @@ void CLandingPad::OrganizeRings() {
 		sort(Markers[i].TmpRings.begin(),Markers[i].TmpRings.end());
 		// == LOG DEBUG ===========================
 		#ifdef RINGDETECTION_DEBUG
-		FILE_LOG(logDEBUG) << "  " << Markers[i].TmpRingsNum << " SORTED";
+        CLOG(TRACE, Logger()) << "  " << Markers[i].TmpRingsNum << " SORTED";
 		its = Markers[i].TmpRings.begin();
 		j=0;
 		while (its!=Markers[i].TmpRings.end()) {
-			FILE_LOG(logDEBUG) << format("  RING %d - R[%3.1f]",j,(*its).OuterCircle.CircleRadius);
+            CLOG(TRACE, Logger()) << format("  RING %d - R[%3.1f]",j,(*its).OuterCircle.CircleRadius);
 			j++;
 			its++;
 		}
@@ -603,7 +617,7 @@ void CLandingPad::OrganizeRings() {
 			if (*it==*itn) {
 				// == LOG DEBUG ===========================
 				#ifdef RINGDETECTION_DEBUG
-				FILE_LOG(logDEBUG) << "  OVERLAPPING RINGS DETECTED";
+                CLOG(TRACE, Logger()) << "  OVERLAPPING RINGS DETECTED";
 				#endif
 				// ========================================
 				// Remove ring with lower Cr confidence
@@ -628,13 +642,13 @@ void CLandingPad::OrganizeRings() {
 		const int markerExpRings = Markers[i].GetTRingNum();
 		// == LOG DEBUG ===========================
 		#ifdef RINGDETECTION_DEBUG
-		FILE_LOG(logDEBUG) << "  EXPECTED RINGS: " << markerExpRings;
+        CLOG(TRACE, Logger()) << "  EXPECTED RINGS: " << markerExpRings;
 		#endif
 		// ========================================
 		if (Markers[i].TmpRingsNum == markerExpRings) {
 			// == LOG DEBUG ===========================
 			#ifdef RINGDETECTION_DEBUG
-			FILE_LOG(logDEBUG) << "  ALL RINGS DETECTED: Copying to marker structure";
+            CLOG(TRACE, Logger()) << "  ALL RINGS DETECTED: Copying to marker structure";
 			#endif
 			// ========================================
 			// Number of rings as expected: copy rings to marker structure preserving order
@@ -655,7 +669,7 @@ void CLandingPad::OrganizeRings() {
 			int numDiff = markerExpRings - Markers[i].TmpRingsNum;
 			// == LOG DEBUG ===========================
 			#ifdef RINGDETECTION_DEBUG
-			FILE_LOG(logDEBUG) << format("  %d RINGS NOT DETECTED",numDiff);
+            CLOG(TRACE, Logger()) << format("  %d RINGS NOT DETECTED",numDiff);
 			#endif
 			// ========================================
 			float ConfDr;
@@ -674,7 +688,7 @@ void CLandingPad::OrganizeRings() {
 			// Conversely, the last row gives the normalized Dr values using the outmost marker ring
 			// == LOG DEBUG ===========================
 			#ifdef RINGDETECTION_DEBUG
-			FILE_LOG(logDEBUG) << "  CALCULATING NORMALIZED Dr - " << numDiff+1 << " COMBINATIONS";
+            CLOG(TRACE, Logger()) << "  CALCULATING NORMALIZED Dr - " << numDiff+1 << " COMBINATIONS";
 			#endif
 			// ========================================
 			for (j=0; j<=numDiff; j++) {
@@ -687,7 +701,7 @@ void CLandingPad::OrganizeRings() {
 				float NormDr = Markers[i].GetTmpRingRadius(TmpNormIdx);
 				// == LOG DEBUG ===========================
 				#ifdef RINGDETECTION_DEBUG
-				FILE_LOG(logDEBUG) << format("  COMBINATION %d - NormRing Idx [%d] R [%3.1f]",j,NormIdx,NormDr);
+                CLOG(TRACE, Logger()) << format("  COMBINATION %d - NormRing Idx [%d] R [%3.1f]",j,NormIdx,NormDr);
 				#endif
 				// ========================================
 				for (int n=0; n<Markers[i].TmpRingsNum; n++)
@@ -698,23 +712,23 @@ void CLandingPad::OrganizeRings() {
 				for (int n=0; n<Markers[i].TmpRingsNum; n++)
 					msg += format(" %3.1f ",TmpDr[j][n]);
 				msg += "]";
-				FILE_LOG(logDEBUG) << msg;
-				FILE_LOG(logDEBUG) << "  IDENTIFYING RINGS WITH Dr MATRIX (type " << mtIdx << ")";
+                CLOG(TRACE, Logger()) << msg;
+                CLOG(TRACE, Logger()) << "  IDENTIFYING RINGS WITH Dr MATRIX (type " << mtIdx << ")";
 				#endif
 				// ========================================
 				// Identify rings using the Dr matrix
 				for (int m=0; m<Markers[i].TmpRingsNum; m++) {
 					// == LOG DEBUG ===========================
 					#ifdef RINGDETECTION_DEBUG
-					FILE_LOG(logDEBUG) << "  TmpRing " << m << " - TmpDr: " << TmpDr[j][m];
-					FILE_LOG(logDEBUG) << "  Cr Matrix:";
+                    CLOG(TRACE, Logger()) << "  TmpRing " << m << " - TmpDr: " << TmpDr[j][m];
+                    CLOG(TRACE, Logger()) << "  Cr Matrix:";
 					for (int n=0; n<Markers[i].GetTRingNum(); n++) {
 						string ms1 = "[ ";
 						for (int r=0; r<Markers[i].GetTRingNum(); r++) {
 							ms1 += format("%3.2f ",Markers[i].GetTDrMVal(n,r));
 						}
 						ms1 += "]";
-						FILE_LOG(logDEBUG) << "  " << ms1;
+                        CLOG(TRACE, Logger()) << "  " << ms1;
 					}
 					#endif
 					// ========================================
@@ -740,7 +754,7 @@ void CLandingPad::OrganizeRings() {
 						if (TmpDr[j][m]>=t1 && TmpDr[j][m]<t2) {
 							#ifdef RINGDETECTION_DEBUG
 							msg += "IDENTIFIED: TmpRing(" << m << ") -> Ring(" << n << ")";
-							FILE_LOG(logDEBUG) << msg;
+                            CLOG(TRACE, Logger()) << msg;
 							#endif
 							TmpIdx[j][m] = n;
 							break;
@@ -748,7 +762,7 @@ void CLandingPad::OrganizeRings() {
 						// == LOG DEBUG ===========================
 						#ifdef RINGDETECTION_DEBUG
 						else {
-							FILE_LOG(logDEBUG) << "NO";
+                            CLOG(TRACE, Logger()) << "NO";
 						}
 						#endif
 						// ========================================
@@ -760,7 +774,7 @@ void CLandingPad::OrganizeRings() {
 				for (int n=0; n<Markers[i].TmpRingsNum; n++)
 					msg += format(" %d ",TmpIdx[j][n]);
 				msg += "]";
-				FILE_LOG(logDEBUG) << msg;
+                CLOG(TRACE, Logger()) << msg;
 				#endif
 				// ========================================
 				// Calculate Dr confidence and update maximum index
@@ -774,7 +788,7 @@ void CLandingPad::OrganizeRings() {
 				}
 				// == LOG DEBUG ===========================
 				#ifdef RINGDETECTION_DEBUG
-				FILE_LOG(logDEBUG) << format("  ConfDr [ Conf %1.3f Max %1.3f MaxIdx %d ]",ConfDr,MaxCDr,MaxCDrIdx);
+                CLOG(TRACE, Logger()) << format("  ConfDr [ Conf %1.3f Max %1.3f MaxIdx %d ]",ConfDr,MaxCDr,MaxCDrIdx);
 				#endif
 				// ========================================
 			}
@@ -792,19 +806,24 @@ void CLandingPad::OrganizeRings() {
 			// TODO: Implement this case
 			// == LOG DEBUG ===========================
 			#ifdef RINGDETECTION_DEBUG
-			FILE_LOG(logDEBUG) << "TOO MUCH RINGS ASSOCIATED WITH MARKER: DISCARDED";
+            CLOG(TRACE, Logger()) << "TOO MUCH RINGS ASSOCIATED WITH MARKER: DISCARDED";
 			#endif
 			// ========================================
 		}
 	}
 }
 
+// Get the logger name
+tCStr CLandingPad::Logger() {
+    return LoggerName.c_str();
+}
+
 // Show information on landing pad detected characteristics
 void CLandingPad::ShowLandingPadInfo() {
 	int i;
-	FILE_LOG(logINFO) << format("LP INFO: %d Markers ===============================",NumMarkers);
+    CLOG(INFO, Logger()) << format("LP INFO: %d Markers ===============================", NumMarkers);
 	for (i=0; i<NumMarkers; i++) {
-		FILE_LOG(logINFO1) << format("MARKER   %d ---------------------------------------",i);
+        CLOG(INFO, Logger()) << format("MARKER   %d ---------------------------------------", i);
 		Markers[i].ShowMarkerInfo();
 	}
 }

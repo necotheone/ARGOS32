@@ -27,7 +27,7 @@
 // -- Logging library -----------------------------------------------------------------------------
 
 #include "EasyLogging\easylogging++.h"
-
+// ELPP_NO_DEFAULT_LOG_FILE defined in project to make it application-wide
 INITIALIZE_EASYLOGGINGPP
 
 // -- ARGOS Vision libraries ----------------------------------------------------------------------
@@ -110,8 +110,23 @@ bool         liveCapture = false;		// Indicates if input comes from camera (true
 bool         goProcessing = false;		// Indicates if processing is active (true)
 bool         Quit = false;				// Flag to trigger finishing the application
 
+// -- Logging helper ------------------------------------------------------------------------------
+// This is required to properly initialize the logging framework before anything else, which
+// includes constructors for CDetectionEngine derived classes (which could use log functions)
+
+class CLogHelper {
+public:
+    // Constructor: EasyLogging initialization
+    CLogHelper() {
+        // -- Setup logging -----------------------------------
+        el::Loggers::configureFromGlobal("ARGOSLoggingConfig.txt");
+        LOG(DEBUG) << "Logging framework initialized from ARGOSLoggingConfig.txt";
+    }
+};
+
 // -- Detection engine ----------------------------------------------------------------------------
 
+CLogHelper LogHelper;
 CProfiling Profiling;
 CDetectionEngine DetectionEngine;
 
@@ -365,35 +380,6 @@ bool CheckKeyboard() {
 	return Quit;
 }
 
-// -- Detection method parameters interface -------------------------------------------------------
-// The available detection method parameters can be configured on the fly when the video input is
-// obtained from a camera. Available parameters depend on the active detection algorithm. Functions
-// implemented here allow for the run-time creation of the required track bars.
-// When the input is obtained from video, track bars define the parameter values for processing the
-// whole frame sequence.
-
-// void onThresholdTrackbar(int value,void* userdata) {
-// 	switch (ProcModeActive) {
-// 	case PROCMOD_STDTHRESHOLD:
-// 		ProcessPar.GrayThreshold=value;
-// 		break;
-// 	case PROCMOD_MSQI:
-// 		ProcessPar.MSQIThreshold=value;
-// 		break;
-// 	}
-// }
-// 
-// void onRoundnessThresholdTrackbar(int value,void* userdata) {
-// 	switch (ProcModeActive) {
-// 	case PROCMOD_STDTHRESHOLD:
-// 		ProcessPar.ContourMinRoundness=(float) value/100;
-// 		break;
-// 	case PROCMOD_MSQI:
-// 		ProcessPar.MSQISigma=value;
-// 		break;
-// 	}
-// }
-
 // -- Main program --------------------------------------------------------------------------------
 
 int main( int argc, char** argv ) {
@@ -404,7 +390,7 @@ int main( int argc, char** argv ) {
 	// -- Show application information --------------------
 	ShowAppInfo();
 	// -- Command line arguments --------------------------
-	if (argc < MIN_ARGS || argc > MAX_ARGS) {
+	if (argc < (MIN_ARGS+1) || argc > (MAX_ARGS+1)) {
         ShowAppHelp();
         return 0;
     }
@@ -445,9 +431,6 @@ int main( int argc, char** argv ) {
 	cout << "Profiling is applied to frame processing, excluding results presentation" << endl;
 	cout << endl;
 	cout << "Video source opened" << endl << endl;
-    // -- Setup logging -----------------------------------
-    el::Loggers::configureFromGlobal("ARGOSLoggingConfig.txt");
-    CLOG(DEBUG, "DMMSQI") << "Testing Easy Logging library";
 	// -- Configure detection engine ----------------------
 	ConfigDetectionEngine();
 	// -- Create windows ----------------------------------

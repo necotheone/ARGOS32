@@ -28,7 +28,6 @@ using namespace std;
 #include "DMIdentifiers.h"
 #include "Profiling.h"
 #include "Marker.h"
-#include "Log.h"
 
 // -- Graphical interface definitions -------------------------------------------------------------
 
@@ -57,23 +56,16 @@ public:
     cv::Mat     ProcessFrame;					// Frame image to be shown with intermediate processing
 	// Log configuration
 protected:
-	string      LogFileName;					// Active log file name
-	string      LogFileMode;					// Log file access mode
-	bool        LogToConsole;					// Indicates if log is also sent to console
-	int         LogLevel;						// Active log level
-	FILE       *LogFile;						// Log file pointer
+	string      LoggerName;					    // Active logger name
 	// Construction and destruction
 public:
 	CDetectionMethod(void);
 	~CDetectionMethod(void);
 	// Log control interface
 public:
-	bool SetupLog(string fn,string m,bool c);	// Setup logging: filename, file access mode and console output
-	void SetLogLevel(TLogLevel n);				// Set active log level
-protected:
-	bool OpenLogFile();							// Open log file and configure logging engine based on log config members
-	void CloseLogFile();						// Close log file if opened
-	// Detection method interface
+	void SetupLog(string logger);	            // Setup logger name (from available loggers in ARGOSLoggingConfig.txt)
+    tCStr Logger();                             // Get the logger name
+    // Detection method interface
 public:
 	virtual cv::Mat Process(cv::Mat &frame);      // Frame processing function
 	virtual void    CheckKeyboard();              // Keyboard input handling

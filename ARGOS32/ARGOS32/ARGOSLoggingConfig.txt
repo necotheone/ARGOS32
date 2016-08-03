@@ -32,22 +32,35 @@
 -- default
 * GLOBAL:
    FORMAT               =  "%datetime %msg"
-   FILENAME             =  "ARGOSLandingPad.log"
+   FILENAME             =  "logs/ARGOSLandingPad.log"
    ENABLED              =  false
    TO_FILE              =  false
    TO_STANDARD_OUTPUT   =  false
-   MILLISECONDS_WIDTH   =  6
+   MILLISECONDS_WIDTH   =  3
    PERFORMANCE_TRACKING =  true
    MAX_LOG_FILE_SIZE    =  2097152   ## 2MB
    LOG_FLUSH_THRESHOLD  =  100       ## Flush after every 100 logs
 * DEBUG:
-   FORMAT               = "%datetime{%d/%M} %func %msg"
+   FORMAT               = "%datetime{%Y%M%d %H%m%s.%g} %func %msg"
+   ENABLED              =  true
+   TO_FILE              =  true
+   MILLISECONDS_WIDTH   =  3
+* INFO:
+   FORMAT               = "%datetime{%Y%M%d %H%m%s.%g} %msg"
+   ENABLED              =  true
+   TO_FILE              =  true
+   MILLISECONDS_WIDTH   =  3
+* TRACE:
+   FORMAT               = "%datetime{%Y%M%d %H%m%s.%g} %msg"
+   ENABLED              =  true
+   TO_FILE              =  true
+   MILLISECONDS_WIDTH   =  3
 
 ## Performance logger
 -- performance
 * GLOBAL:
    FORMAT               =  "%datetime %msg"
-   FILENAME             =  "ARGOSLandingPad.log"
+   FILENAME             =  "logs/ARGOSLandingPad.log"
    ENABLED              =  false
    TO_FILE              =  false
    TO_STANDARD_OUTPUT   =  false
@@ -62,7 +75,7 @@
 -- DMThreshold
 * GLOBAL:
    FORMAT               =  "%datetime %msg"
-   FILENAME             =  "DML-Threshold.log"
+   FILENAME             =  "logs/DML-Threshold.log"
    ENABLED              =  false
    TO_FILE              =  false
    TO_STANDARD_OUTPUT   =  false
@@ -71,13 +84,26 @@
    MAX_LOG_FILE_SIZE    =  2097152
    LOG_FLUSH_THRESHOLD  =  100
 * DEBUG:
-   FORMAT               = "%datetime{%d/%M} %func %msg"
+   FORMAT               = "%datetime{%Y%M%d %H%m%s.%g} %func %msg"
+   ENABLED              =  true
+   TO_FILE              =  true
+   MILLISECONDS_WIDTH   =  3
+* INFO:
+   FORMAT               = "%datetime{%Y%M%d %H%m%s.%g} %msg"
+   ENABLED              =  true
+   TO_FILE              =  true
+   MILLISECONDS_WIDTH   =  3
+* TRACE:
+   FORMAT               = "%datetime{%Y%M%d %H%m%s.%g} %msg"
+   ENABLED              =  true
+   TO_FILE              =  true
+   MILLISECONDS_WIDTH   =  3
 
 ## MSQI detection method logger
 -- DMMSQI
 * GLOBAL:
    FORMAT               =  "%datetime %msg"
-   FILENAME             =  "DML-MSQI.log"
+   FILENAME             =  "logs/DML-MSQI.log"
    ENABLED              =  false
    TO_FILE              =  false
    TO_STANDARD_OUTPUT   =  false
@@ -86,7 +112,17 @@
    MAX_LOG_FILE_SIZE    =  2097152
    LOG_FLUSH_THRESHOLD  =  100
 * DEBUG:
-   FORMAT               = "%datetime{%Y.%M.%d %H:%m:%s.%g} %func %msg"
+   FORMAT               = "%datetime{%Y%M%d %H%m%s.%g} %func %msg"
+   ENABLED              =  true
+   TO_FILE              =  true
+   MILLISECONDS_WIDTH   =  3
+* INFO:
+   FORMAT               = "%datetime{%Y%M%d %H%m%s.%g} %msg"
+   ENABLED              =  true
+   TO_FILE              =  true
+   MILLISECONDS_WIDTH   =  3
+* TRACE:
+   FORMAT               = "%datetime{%Y%M%d %H%m%s.%g} %msg"
    ENABLED              =  true
    TO_FILE              =  true
    MILLISECONDS_WIDTH   =  3

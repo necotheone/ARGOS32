@@ -58,11 +58,9 @@ CDetectionEngine::CDetectionEngine(void) {
 	// Add and configure available detection methods
 	DetectionMethods.resize(DM_COUNT);
 	DetectionMethods[DM_THRESHOLD] = (CDetectionMethod *) new CDMThresholdContour();
-	DetectionMethods[DM_THRESHOLD]->SetupLog("DML-ContourThreshold.log","w",false);
-	DetectionMethods[DM_THRESHOLD]->SetLogLevel(logINFO);
+	DetectionMethods[DM_THRESHOLD]->SetupLog("DMThreshold");
 	DetectionMethods[DM_MSQI] = (CDetectionMethod *) new CDMMSQI();
-	DetectionMethods[DM_MSQI]->SetupLog("DML-MSQI.log","w",false);
-	DetectionMethods[DM_MSQI]->SetLogLevel(logINFO);
+	DetectionMethods[DM_MSQI]->SetupLog("DMMSQI");
 	ActiveDM = DM_THRESHOLD;
 }
 

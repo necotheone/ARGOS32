@@ -20,6 +20,11 @@
 // -- Class declarations --------------------------------------------------------------------------
 
 #include "DMThresholdContour.h"
+
+// -- Logging library -----------------------------------------------------------------------------
+
+#include "EasyLogging\easylogging++.h"
+
 using namespace cv;
 
 // -- Construction and destruction ----------------------------------------------------------------
@@ -40,7 +45,8 @@ CDMThresholdContour::~CDMThresholdContour(void) {
 Mat CDMThresholdContour::Process(Mat &frame) {
 	unsigned int i;
 
-	Profiling.Start(PROFILE_TIMER1);
+    CLOG(INFO, Logger()) << format("Processing frame %05d", nFrames+1) << " with " << DMName;
+    Profiling.Start(PROFILE_TIMER1);
 	// Convert captured frame to gray scale
 	cvtColor(frame,gframe,CV_RGB2GRAY);
 	// Equalize frame to normalize brightness and increase contrast
@@ -121,8 +127,8 @@ Mat CDMThresholdContour::Process(Mat &frame) {
 						bool r = LandingPad.AddRing(MarkerRing);
 						// == LOG INFO ===========================================
 						string msg = format("RING FOUND %02d (%3.0f,%3.0f) - %02d (%3.0f,%3.0f)",i,mc[i].x,mc[i].y,ih,mc[ih].x,mc[ih].y);
-						FILE_LOG(logDEBUG2) << msg;
-						// =======================================================
+                        CLOG(TRACE, Logger()) << msg;
+                        // =======================================================
 					}
 					ih = hierarchy[ih][0];
 				} while (ih!=-1);
@@ -139,7 +145,6 @@ Mat CDMThresholdContour::Process(Mat &frame) {
 	Profiling.Stop(PROFILE_TIMER1);
 	nFrames++;
 	TotProcTime = TotProcTime+Profiling.GetTime(PROFILE_TIMER1);
-	//ShowFrameStatistics();
 	// Save frames for showing information
 	ResultsFrame = frame;
 	ProcessFrame = bframe;
@@ -203,6 +208,7 @@ void CDMThresholdContour::ShowInfo() {
 
 void CDMThresholdContour::LogInfo() {
 	// Results and information logging on console and file
+    LogFrameStatistics();
 	LandingPad.ShowLandingPadInfo();
 }
 
@@ -218,7 +224,7 @@ void CDMThresholdContour::LogFrameStatistics() {
 	string msg;
 
 	msg = format("%05d : %3.1f - Contours: %04d - V(%03d) S(%03d) C(%03d) N(%03d) IR(%02d) OR(%02d)",nFrames,TotProcTime*1000.0/nFrames,nContours,nCandidates,nSmall,nNotCircle,nNoHole,nInnerRing,nOuterRing);
-	FILE_LOG(logINFO) << msg;
+    CLOG(INFO, Logger()) << msg;
 }
 
 int CDMThresholdContour::GetParNumber() {

@@ -24,46 +24,25 @@ using namespace cv;
 // -- Construction and destruction ----------------------------------------------------------------
 
 CDetectionMethod::CDetectionMethod(void) {
-	LogFileName = "";
-	LogFileMode = "w";
-	LogToConsole = false;
-	FILELog::ReportingLevel() = logDEBUG3;
+	LoggerName = "default";
 }
 
 CDetectionMethod::~CDetectionMethod(void) {
-	CloseLogFile();
 }
 
 // -- Log control interface -----------------------------------------------------------------------
 
-bool CDetectionMethod::SetupLog(string fn,string m,bool c) {
-	// Setup logging: filename, file access mode and console output
-	LogFileName = fn;
-	LogFileMode = m;
-	LogToConsole = c;
-	bool res = OpenLogFile();
-	return res;
+void CDetectionMethod::SetupLog(string logger) {
+	// Setup logger to use for this detection method (must be one of the loggers defined
+    // in ARGOSLoggingConfig.txt)
+    // TODO: Check logger is available, handle errors
+	LoggerName = logger;
+    LandingPad.LoggerName = logger;
 }
 
-void CDetectionMethod::SetLogLevel(TLogLevel n) {
-	// Set active log level
-	FILELog::ReportingLevel() = n;
-}
-
-bool CDetectionMethod::OpenLogFile() {
-	// Open log file and configure logging engine based on log config members
-	FILELog::ReportingLevel() = logDEBUG3;
-	LogFile = fopen(LogFileName.c_str(),LogFileMode.c_str());
-	if (LogFile!=NULL)
-		Output2FILE::Stream() = LogFile;
-	//FILELog::ConsoleActive() = LogToConsole;
-	return (LogFile!=NULL);
-}
-
-void CDetectionMethod::CloseLogFile() {
-	// Close log file if opened
-	fclose(LogFile);
-	LogFile = NULL;
+// Get the logger name
+tCStr CDetectionMethod::Logger() {
+    return LoggerName.c_str();
 }
 
 // -- Common implementation of virtual interface --------------------------------------------------

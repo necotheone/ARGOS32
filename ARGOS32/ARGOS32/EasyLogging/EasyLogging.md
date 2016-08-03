@@ -170,6 +170,7 @@ Easylogging++ is easy to configure. There are three possible ways to do so,
 
 #### Using Configuration File
 Configuration can be done by file that is loaded at runtime by `Configurations` class. This file has following format;
+
 ```
 * LEVEL:
   CONFIGURATION NAME  = "VALUE" ## Comment
@@ -195,6 +196,7 @@ Following table contains configurations supported by configuration file.
 Please do not use double-quotes anywhere in comment, you might end up in unexpected behaviour.
 
 Sample Configuration File
+
 ```
 * GLOBAL:
    FORMAT               =  "%datetime %msg"
@@ -214,6 +216,7 @@ Sample Configuration File
 Configuration file contents in above sample is straightforward. We start with `GLOBAL` level in order to override all the levels. Any explicitly defined subsequent level will override configuration from `GLOBAL`. For example, all the levels except for `DEBUG` have the same format, i.e, datetime and log message. For `DEBUG` level, we have only date (with day and month), source function and log message. The rest of configurations for `DEBUG` are used from `GLOBAL`. Also, notice `{%d/%M}` in `DEBUG` format above, if you do not specify date format, default format is used. Default values of date/time is `%d/%M/%Y %h:%m:%s,%g` For more information on these format specifiers, please refer to [Date/Time Format Specifier](#datetime-format-specifiers) section below
 
 ##### Usage
+
 ```c++
 #include "easylogging++.h"
 
@@ -236,6 +239,7 @@ int main(int argc, const char** argv) {
  
 #### Using el::Configurations Class
 You can set configurations or reset configurations;
+
 ```c++
 #include "easylogging++.h"
 
@@ -264,6 +268,7 @@ int main(int argc, const char** argv) {
  
 #### Using In line Configurations
 Inline configuration means you can set configurations in `std::string` but make sure you add all the new line characters etc. This is not recommended because it's always messy.
+
 ```c++
 el::Configurations c;
 c.setToDefault();
@@ -281,6 +286,7 @@ If you wish to have a configuration for existing and future loggers, you can use
  
 ### Global Configurations
 `Level::Global` is nothing to do with global configurations, it is concept where you can register configurations for all/or some loggers and even register new loggers using configuration file. Syntax of configuration file is:
+
 ```
 -- LOGGER ID ## Case sensitive
   ## Everything else is same as configuration file
@@ -291,6 +297,7 @@ If you wish to have a configuration for existing and future loggers, you can use
 ```
 
 Logger ID starts with two dashes. Once you have written your global configuration file you can configure your all loggers (and register new ones) using single function;
+
 ```c++
 int main(void) {
    // Registers new and configures it or
@@ -467,6 +474,7 @@ You are provided with two basic macros that you can use in order to write logs:
 
 `LOG` uses 'default' logger while in CLOG (Custom LOG) you specify the logger ID. For LEVELs please refer to Configurations - Levels section above. Different loggers might have different configurations depending on your need, you may as well write custom macro to access custom logger. You also have different macros for verbose logging that is explained in section below.
 Here is very simple example of using these macros after you have initialized easylogging++.
+
 ```c++
 LOG(INFO) << "This is info log";
 CLOG(ERROR, "performance") << "This is info log using performance logger";
@@ -475,6 +483,7 @@ CLOG(ERROR, "performance") << "This is info log using performance logger";
 There is another way to use same macro i.e, `LOG` (and associated macros). This is that you define macro `ELPP_DEFAULT_LOGGER` and `ELPP_CURR_FILE_PERFORMANCE_LOGGER_ID` with logger ID that is already registered, and now when you use `LOG` macro, it automatically will use specified logger instead of `default` logger. Please note that this should be defined in source file instead of header file. This is so that when we include header we dont accidently use invalid logger.
 
 A quick example is here
+
 ```c++
 #ifndef ELPP_DEFAULT_LOGGER
 #   define ELPP_DEFAULT_LOGGER "update_manager"
@@ -508,6 +517,7 @@ Helper macros end with _IF;
 
 
 #### Some examples:
+
 ```c++
 LOG_IF(condition, INFO) << "Logged if condition is true";
 
@@ -531,6 +541,7 @@ There are some other ways of logging as well based on hit counts. These useful m
 * `LOG_N_TIMES(n, LEVEL)`; Logs n times
 
 #### Some examples:
+
 ```c++
 for (int i = 1; i <= 10; ++i) {
    LOG_EVERY_N(2, INFO) << "Logged every second iter";
@@ -858,6 +869,7 @@ Easylogging++ has ability to roll out (or throw away / rotate) log files if they
 If you are having failure in log-rollout, you may have failed to add flag i.e, `el::LoggingFlags::StrictLogFileSizeCheck`.
 
 This feature has it's own section in this reference manual because you can do stuffs with the file being thrown away. This is useful, for example if you wish to back this file up etc.
+
 This can be done by using `el::Helpers::installPreRollOutCallback(const PreRollOutCallback& handler)` where `PreRollOutCallback` is typedef of type `std::function<void(const char*, std::size_t)>`. Please note following if you are using this feature
 
 There is a [sample](https://github.com/easylogging/easyloggingpp/tree/master/samples/STL/logrotate.cpp) available that you can use as basis.
@@ -895,6 +907,7 @@ You can use your own crash handler by using `el::Helpers::setCrashHandler(const 
 > Make sure to abort application at the end of your crash handler using `el::Helpers::crashAbort(int)`. If you fail to do so, you will get into endless loop of crashes.
 
 Here is a good example of your own handler
+
 ```c++
 #include "easylogging++.h"
 
@@ -968,6 +981,7 @@ Easylogging++ supports `perror()` styled logging using `PLOG(LEVEL)`, `PLOG_IF(C
 Easylogging++ supports syslog for platforms that have `syslog.h` header. In order to enable it, you need to define `ELPP_SYSLOG`. If your platform does not have `syslog.h`, make sure you do not define this macro or you will end up in errors. Once you are ready to use syslog, you can do so by using one of `SYSLOG(LEVEL)`, `SYSLOG_IF(Condition, LEVEL)`, `SYSLOG_EVERY_N(n, LEVEL)` and uses logger ID: `syslog`. If you want to use custom logger you can do so by using `CSYSLOG(LEVEL, loggerId)` or `CSYSLOG_IF(Condition, LEVEL, loggerId)` or `CSYSLOG_EVERY_N(n, LEVEL, loggerId)`
 
 Syslog in Easylogging++ supports C++ styled streams logging, following example;
+
 ```c++
 #include "easylogging++.h"
 
@@ -1063,6 +1077,7 @@ You may also have a look at wxWidgets sample
 #### Logging Your Own Class
 
 You can log your own classes by extending `el::Loggable` class and implementing pure-virtual function `void log(std::ostream& os) const`. Following example shows a good way to extend a class.
+
 ```c++
 #include "easylogging++.h"
 
@@ -1097,6 +1112,7 @@ int main(void) {
 Let's say you have third-party class that you don't have access to make changes to, and it's not yet loggable. In order to make it loggable, you can use `MAKE_LOGGABLE(ClassType, ClassInstance, OutputStreamInstance)` to make it Easylogging++ friendly.
 
 Following sample shows a good usage:
+
 ```c++
 #include "easylogging++.h"
 

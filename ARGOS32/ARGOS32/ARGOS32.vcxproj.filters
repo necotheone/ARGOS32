@@ -71,9 +71,6 @@
     <ClInclude Include="DMThresholdContour.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
-    <ClInclude Include="Log.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="EasyLogging\easylogging++.h">
       <Filter>Librería EasyLogging</Filter>
     </ClInclude>
@@ -93,13 +90,13 @@
     <Text Include="ChangeLog.txt">
       <Filter>Información de proyecto</Filter>
     </Text>
-    <Text Include="ARGOSLandingPad.log">
+    <Text Include="logs\ARGOSLandingPad.log">
       <Filter>Logs</Filter>
     </Text>
-    <Text Include="DML-MSQI.log">
+    <Text Include="logs\DML-MSQI.log">
       <Filter>Logs</Filter>
     </Text>
-    <Text Include="DML-Threshold.log">
+    <Text Include="logs\DML-Threshold.log">
       <Filter>Logs</Filter>
     </Text>
   </ItemGroup>

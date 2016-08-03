@@ -75,6 +75,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\OpenCV\install\include;C:\OpenCV\install\include\opencv;C:\OpenCV\install\include\opencv2</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\OpenCV\install\x86\vc14\lib</AdditionalLibraryDirectories>
@@ -96,6 +97,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\OpenCV\install\include;C:\OpenCV\install\include\opencv;C:\OpenCV\install\include\opencv2</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -133,7 +135,6 @@
     <ClInclude Include="DMMSQI.h" />
     <ClInclude Include="DMThresholdContour.h" />
     <ClInclude Include="EasyLogging\easylogging++.h" />
-    <ClInclude Include="Log.h" />
     <ClInclude Include="Marker.h" />
     <ClInclude Include="Profiling.h" />
   </ItemGroup>
@@ -142,11 +143,11 @@
     <None Include="EasyLogging\EasyLogging.md" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ARGOSLandingPad.log" />
     <Text Include="ARGOSLoggingConfig.txt" />
     <Text Include="ChangeLog.txt" />
-    <Text Include="DML-MSQI.log" />
-    <Text Include="DML-Threshold.log" />
+    <Text Include="logs\ARGOSLandingPad.log" />
+    <Text Include="logs\DML-MSQI.log" />
+    <Text Include="logs\DML-Threshold.log" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
